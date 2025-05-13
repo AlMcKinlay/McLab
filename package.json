@@ -5,8 +5,5 @@
 	"main": "index.js",
 	"repository": "git@github.com:McInkay/bingo.git",
 	"author": "Al McKinlay <github@10people.co.uk>",
-	"license": "MIT",
-	"scripts": {
-		"transcripts": "cd ise-transcripts && node index.mjs"
-	}
+	"license": "MIT"
 }

@@ -1,8 +1,0 @@
-{
-	"name": "ise-transcripts",
-	"version": "0.1.0",
-	"private": true,
-	"dependencies": {
-		"youtube-transcript": "github:sinedied/youtube-transcript#a10a073ac325b3b88018f321fa1bc5d62fa69b1c"
-	}
-}
