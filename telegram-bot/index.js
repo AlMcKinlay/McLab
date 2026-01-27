@@ -5,6 +5,19 @@ import { registerNathanCommands } from "./commands/nathan.js";
 
 const bot = new Telegraf(config.botToken);
 
+// Timeout helper for Telegram API calls
+function withTimeout(promise, ms, operationName) {
+	return Promise.race([
+		promise,
+		new Promise((_, reject) =>
+			setTimeout(
+				() => reject(new Error(`${operationName} timed out after ${ms}ms`)),
+				ms,
+			),
+		),
+	]);
+}
+
 // Global error handler for unhandled promise rejections
 process.on("unhandledRejection", (reason, promise) => {
 	console.error(
@@ -37,10 +50,16 @@ bot.use((ctx, next) => {
 		console.error(
 			`[${timestamp}] ❌ Middleware error for ${userName}: ${error.message}`,
 		);
-		// Try to notify user if possible
-		ctx
-			.answerCbQuery?.(`Error: ${error.message}`, { show_alert: true })
-			.catch(() => {});
+		// Try to notify user if this is a callback query
+		if (ctx.callbackQuery) {
+			ctx
+				.answerCbQuery?.(`Error: ${error.message}`, { show_alert: true })
+				.catch((err) => {
+					console.error(
+						`[${timestamp}] ❌ Failed to answer callback query: ${err.message}`,
+					);
+				});
+		}
 	});
 });
 
@@ -81,15 +100,34 @@ bot.command("help", (ctx) => {
 // Register command handlers
 registerNathanCommands(bot);
 
-// Handle any other messages
-bot.on(message(), (ctx) => {
-	ctx.reply(`I don't understand that command. Try /help to see what I can do!`);
-});
+// No catch-all handler - bot only responds to explicit commands and buttons
 
-// Error handling
+// Error handling - catch Telegram errors
 bot.catch((err, ctx) => {
-	console.error(`[${new Date().toISOString()}] Telegraf error:`, err);
-	ctx.reply("❌ An error occurred. Please try again later.").catch(() => {});
+	const timestamp = new Date().toISOString();
+	const userName = ctx.from?.first_name || "Unknown";
+	console.error(
+		`[${timestamp}] ❌ Telegraf error for ${userName}: ${err.message}`,
+	);
+	console.error(`[${timestamp}] Error details:`, err);
+
+	// Try to send error response, but don't hang if it fails
+	Promise.race([
+		ctx
+			.reply("❌ An error occurred. Please try again later.")
+			.catch((replyErr) => {
+				console.error(
+					`[${timestamp}] Failed to send error reply: ${replyErr.message}`,
+				);
+			}),
+		new Promise((_, reject) =>
+			setTimeout(() => reject(new Error("Error reply timeout")), 5000),
+		),
+	]).catch((timeoutErr) => {
+		console.error(
+			`[${timestamp}] Error response timed out: ${timeoutErr.message}`,
+		);
+	});
 });
 
 // Start the bot with error handling and retry logic
@@ -99,10 +137,37 @@ async function startBot() {
 
 	while (retries < maxRetries) {
 		try {
-			await bot.launch();
-			console.log(
-				`[${new Date().toISOString()}] ✅ Bot successfully connected to Telegram API`,
-			);
+			bot.launch(async () => {
+				console.log(
+					`[${new Date().toISOString()}] ✅ Bot successfully connected to Telegram API`,
+				);
+
+				// Set up menu commands after successful launch
+				try {
+					await bot.telegram.setMyCommands([
+						{ command: "nathan", description: "Rate your day" },
+						{ command: "help", description: "Show available commands" },
+					]);
+
+					// Set menu button for all chats (global)
+					await bot.telegram.setChatMenuButton({
+						menu_button: {
+							type: "commands",
+						},
+					});
+
+					console.log(
+						`[${new Date().toISOString()}] ✅ Menu button set to show commands`,
+					);
+				} catch (error) {
+					console.error(
+						`[${new Date().toISOString()}] ⚠️  Failed to set menu commands: ${
+							error.message
+						}`,
+					);
+					// This is not critical, bot can still function
+				}
+			});
 			break;
 		} catch (error) {
 			retries++;
@@ -126,27 +191,6 @@ async function startBot() {
 			}
 		}
 	}
-
-	// Set up menu commands after successful launch
-	try {
-		await bot.telegram.setMyCommands([
-			{ command: "nathan", description: "Rate your day" },
-			{ command: "help", description: "Show available commands" },
-		]);
-
-		await bot.telegram.setChatMenuButton({
-			menu_button: {
-				type: "commands",
-			},
-		});
-	} catch (error) {
-		console.error(
-			`[${new Date().toISOString()}] ⚠️  Failed to set menu commands: ${
-				error.message
-			}`,
-		);
-		// This is not critical, bot can still function
-	}
 }
 
 // Start the bot
@@ -155,7 +199,6 @@ startBot();
 console.log(
 	`[${new Date().toISOString()}] 🤖 Nathan Sheet Telegram bot started`,
 );
-console.log(`Bot ready to respond to /nathan command for rating updates.`);
 
 // Watchdog timer to detect hanging
 let lastActivity = Date.now();
@@ -184,7 +227,7 @@ setInterval(() => {
 			).toFixed(1)}s)`,
 		);
 	}
-}, 30000);
+}, 1000);
 
 // Handle graceful shutdown
 process.once("SIGINT", () => {
