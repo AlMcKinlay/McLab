@@ -5,5 +5,10 @@
 	"main": "index.js",
 	"repository": "git@github.com:McInkay/bingo.git",
 	"author": "Al McKinlay <github@10people.co.uk>",
-	"license": "MIT"
+	"license": "MIT",
+	"type": "module",
+	"scripts": {
+		"telegram:dev": "cd telegram-bot && node --env-file=.env index.js",
+		"telegram:install": "cd telegram-bot && npm install"
+	}
 }
