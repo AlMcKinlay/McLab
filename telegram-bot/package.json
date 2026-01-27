@@ -1,0 +1,22 @@
+{
+	"name": "telegram-bot",
+	"version": "1.0.0",
+	"description": "Telegram bot for Nathan Sheet updates",
+	"main": "index.js",
+	"type": "module",
+	"scripts": {
+		"telegram:dev": "node index.js",
+		"telegram:start": "pm2 start ecosystem.config.js --env production",
+		"telegram:stop": "pm2 stop nathan-sheet-bot",
+		"telegram:restart": "pm2 restart nathan-sheet-bot",
+		"telegram:logs": "pm2 logs nathan-sheet-bot",
+		"telegram:status": "pm2 status nathan-sheet-bot"
+	},
+	"dependencies": {
+		"telegraf": "^4.15.0",
+		"@notionhq/client": "^5.8.0"
+	},
+	"devDependencies": {
+		"pm2": "^5.3.0"
+	}
+}
