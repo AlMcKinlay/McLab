@@ -1,6 +1,6 @@
-# Telegram Nathan Sheet Bot
+# kildonan Bot
 
-A Telegram bot that allows you and your wife to rate your day and update it to Notion.
+A Telegram bot for the McKinlays
 
 ## Quick Start
 
@@ -79,7 +79,7 @@ Run the bot as a system service that starts automatically on boot.
 3. **Clone or copy your code:**
 
    ```bash
-   git clone https://github.com/yourusername/McLab.git ~/McLab
+   git clone https://github.com/AlMcKinlay/McLab.git ~/McLab
    cd ~/McLab/telegram-bot
    npm install
    ```
@@ -94,9 +94,9 @@ Run the bot as a system service that starts automatically on boot.
 5. **Create systemd service:**
 
    ```bash
-   sudo tee /etc/systemd/system/nathan-telegram-bot.service > /dev/null << 'EOF'
+   sudo tee /etc/systemd/system/kildonan-bot.service > /dev/null << 'EOF'
    [Unit]
-   Description=Nathan Sheet Telegram Bot
+   Description=Kildonan Telegram Bot
    After=network.target
 
    [Service]
@@ -119,14 +119,14 @@ Run the bot as a system service that starts automatically on boot.
 
    ```bash
    sudo systemctl daemon-reload
-   sudo systemctl enable nathan-telegram-bot
-   sudo systemctl start nathan-telegram-bot
+   sudo systemctl enable kildonan-bot
+   sudo systemctl start kildonan-bot
    ```
 
 7. **Check status:**
    ```bash
-   sudo systemctl status nathan-telegram-bot
-   sudo journalctl -u nathan-telegram-bot -f  # Follow logs
+   sudo systemctl status kildonan-bot
+   sudo journalctl -u kildonan-bot -f  # Follow logs
    ```
 
 ### Option 2: PM2 (Process Manager)
@@ -136,7 +136,7 @@ Run the bot as a system service that starts automatically on boot.
 sudo npm install -g pm2
 
 # Start the bot
-pm2 start index.js --name nathan-bot --env-file .env
+pm2 start index.js --name kildonan-bot --env-file .env
 
 # Set to start on boot
 pm2 startup
@@ -144,7 +144,7 @@ pm2 save
 
 # Check status
 pm2 status
-pm2 logs nathan-bot
+pm2 logs kildonan-bot
 ```
 
 ### Option 3: Docker
@@ -154,11 +154,11 @@ If you have Docker installed, you can containerize the bot.
 Run with:
 
 ```bash
-docker build -t nathan-bot .
+docker build -t kildonan-bot .
 docker run -d --restart always \
   -e TELEGRAM_BOT_TOKEN=your_token \
   -e NOTION_TOKEN=your_token \
-  --name nathan-bot nathan-bot
+  --name kildonan-bot kildonan-bot
 ```
 
 ## Usage
@@ -189,24 +189,24 @@ Click a rating button and the bot will:
 **With systemd:**
 
 ```bash
-sudo systemctl status nathan-telegram-bot
-sudo journalctl -u nathan-telegram-bot -n 50  # Last 50 lines
-sudo journalctl -u nathan-telegram-bot -f     # Follow in real-time
+sudo systemctl status kildonan-bot
+sudo journalctl -u kildonan-bot -n 50  # Last 50 lines
+sudo journalctl -u kildonan-bot -f     # Follow in real-time
 ```
 
 **With PM2:**
 
 ```bash
 pm2 status
-pm2 logs nathan-bot
+pm2 logs kildonan-bot
 ```
 
 ### Common Issues
 
 **Bot not responding:**
 
-- Check service is running: `sudo systemctl status nathan-telegram-bot`
-- Check logs: `sudo journalctl -u nathan-telegram-bot -f`
+- Check service is running: `sudo systemctl status kildonan-bot`
+- Check logs: `sudo journalctl -u kildonan-bot -f`
 - Verify `TELEGRAM_BOT_TOKEN` is correct in `.env`
 - Verify internet connectivity on your system
 

@@ -1,3 +1,4 @@
+import { message } from "telegraf/filters";
 import { updateNathanSheet, checkTodayFilled } from "../apis/notion.js";
 
 const pendingConfirmations = new Map();
@@ -23,12 +24,24 @@ async function performUpdate(ctx, rating, userName, editMessage = false) {
 
 		if (editMessage) {
 			try {
-				await ctx.editMessageText(message, { parse_mode: "HTML" });
+				await withTimeout(
+					ctx.editMessageText(message, { parse_mode: "HTML" }),
+					5000,
+					"editMessageText",
+				);
 			} catch (e) {
-				await ctx.reply(message, { parse_mode: "HTML" });
+				await withTimeout(
+					ctx.reply(message, { parse_mode: "HTML" }),
+					5000,
+					"reply_fallback",
+				);
 			}
 		} else {
-			await ctx.reply(message, { parse_mode: "HTML" });
+			await withTimeout(
+				ctx.reply(message, { parse_mode: "HTML" }),
+				5000,
+				"reply",
+			);
 		}
 
 		console.log(
@@ -43,8 +56,8 @@ async function performUpdate(ctx, rating, userName, editMessage = false) {
 }
 
 export function registerNathanCommands(bot) {
-	// Button in keyboard
-	bot.hears("📊 Set Nathan Status", async (ctx) => {
+	// Helper function to show rating buttons
+	async function showRatingButtons(ctx) {
 		await ctx.reply(`What's your rating for today?`, {
 			reply_markup: {
 				inline_keyboard: [
@@ -56,30 +69,16 @@ export function registerNathanCommands(bot) {
 				],
 			},
 		});
+	}
+
+	// Handle keyboard button - using exact match
+	bot.hears("📊 Set Nathan Status", async (ctx) => {
+		await showRatingButtons(ctx);
 	});
 
 	// /nathan command
 	bot.command("nathan", async (ctx) => {
-		await ctx.reply(`What's your rating for today?`, {
-			reply_markup: {
-				inline_keyboard: [
-					[
-						{ text: "😊 Good", callback_data: "rating_good" },
-						{ text: "😐 OK", callback_data: "rating_ok" },
-						{ text: "😞 Bad", callback_data: "rating_bad" },
-					],
-				],
-			},
-		});
-
-		// Keep persistent keyboard visible
-		await ctx.reply(" ", {
-			reply_markup: {
-				keyboard: [[{ text: "📊 Set Nathan Status" }]],
-				resize_keyboard: true,
-				one_time_keyboard: false,
-			},
-		});
+		await showRatingButtons(ctx);
 	});
 
 	// Rating button clicks
@@ -88,7 +87,7 @@ export function registerNathanCommands(bot) {
 		const rating = ctx.match[1];
 
 		try {
-			await ctx.sendChatAction("typing");
+			await withTimeout(ctx.sendChatAction("typing"), 5000, "sendChatAction");
 			const check = await withTimeout(
 				checkTodayFilled(),
 				10000,
@@ -97,39 +96,47 @@ export function registerNathanCommands(bot) {
 
 			if (check.filled) {
 				const emoji = rating === "good" ? "😊" : rating === "ok" ? "😐" : "😞";
-				await ctx.editMessageText(
-					`⚠️ Today is already filled in!\n\nDo you want to overwrite it with ${emoji} **${rating.toUpperCase()}**?`,
-					{
-						parse_mode: "HTML",
-						reply_markup: {
-							inline_keyboard: [
-								[
-									{
-										text: "✓ Yes, overwrite",
-										callback_data: `confirm_${rating}_yes`,
-									},
-									{
-										text: "✗ No, cancel",
-										callback_data: `confirm_${rating}_no`,
-									},
+				await withTimeout(
+					ctx.editMessageText(
+						`⚠️ Today is already filled in!\n\nDo you want to overwrite it with ${emoji} **${rating.toUpperCase()}**?`,
+						{
+							parse_mode: "HTML",
+							reply_markup: {
+								inline_keyboard: [
+									[
+										{
+											text: "✓ Yes, overwrite",
+											callback_data: `confirm_${rating}_yes`,
+										},
+										{
+											text: "✗ No, cancel",
+											callback_data: `confirm_${rating}_no`,
+										},
+									],
 								],
-							],
+							},
 						},
-					},
+					),
+					5000,
+					"editMessageText",
 				);
 
 				pendingConfirmations.set(ctx.from.id, { rating, userName });
 			} else {
 				await performUpdate(ctx, rating, userName, true);
 			}
-			await ctx.answerCbQuery();
+			await withTimeout(ctx.answerCbQuery(), 5000, "answerCbQuery");
 		} catch (error) {
 			const errorMsg = error.message || "Unknown error";
 			console.error(
 				`[${new Date().toISOString()}] ✗ Error for ${userName}: ${errorMsg}`,
 			);
 			try {
-				await ctx.answerCbQuery(`❌ Error: ${errorMsg}`, { show_alert: true });
+				await withTimeout(
+					ctx.answerCbQuery(`❌ Error: ${errorMsg}`, { show_alert: true }),
+					5000,
+					"answerCbQuery_error",
+				);
 			} catch (e) {
 				console.error("Failed to answer callback query:", e.message);
 			}
