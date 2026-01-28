@@ -1,8 +1,0 @@
-{
-	"name": "ise-transcripts",
-	"version": "0.1.0",
-	"private": true,
-	"dependencies": {
-		"youtube-transcript": "1.0.4"
-	}
-}

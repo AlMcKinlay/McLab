@@ -3,17 +3,13 @@ MAKEFLAGS += --silent
 
 buildBingo:
 	cd bingo && \
-	yarn --frozen-lockfile --non-interactive && \
-	yarn build
+	npm i && \
+	npm run build && \
+	cd ..
 
 buildFunctions:
 	cd functions/bin && \
 	npm i
-
-buildHungerGames:
-	cd hunger-games && \
-	npm i && \
-	npm run build
 
 buildPokemonList:
 	cd pokemon-list && \
@@ -22,15 +18,16 @@ buildPokemonList:
 
 buildSwitch:
 	cd switch && \
-	yarn --frozen-lockfile --non-interactive && \
-	yarn build
+	npm i && \
+	npm run build
 
 copyBuilds:
+	mkdir -p build
 	mv bingo/build build/bingo
-	mv hunger-games/build build/hunger-games
 	mv pokemon-list/build build/pokemon-list
 	mv switch/build build/switch
+	cp homepage/* build/
 
-build: buildBingo buildFunctions buildHungerGames buildPokemonList buildSwitch copyBuilds
+build: buildBingo buildFunctions buildPokemonList buildSwitch copyBuilds
 
 .PHONY: build
