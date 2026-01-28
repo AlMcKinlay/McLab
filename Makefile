@@ -22,6 +22,7 @@ buildSwitch:
 	npm run build
 
 copyBuilds:
+	rm -rf build
 	mkdir -p build
 	mv bingo/build build/bingo
 	mv pokemon-list/build build/pokemon-list

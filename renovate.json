@@ -1,5 +1,5 @@
 {
-	"extends": ["config:base"],
+	"extends": ["config:recommended"],
 	"assignees": ["AlMcKinlay"],
 	"automerge": true,
 	"major": {
