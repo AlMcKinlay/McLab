@@ -3,8 +3,8 @@ MAKEFLAGS += --silent
 
 buildBingo:
 	cd bingo && \
-	yarn --frozen-lockfile --non-interactive && \
-	yarn build
+	npm i && \
+	npm run build
 
 buildFunctions:
 	cd functions/bin && \
@@ -17,8 +17,8 @@ buildPokemonList:
 
 buildSwitch:
 	cd switch && \
-	yarn --frozen-lockfile --non-interactive && \
-	yarn build
+	npm i && \
+	npm run build
 
 copyBuilds:
 	mv bingo/build build/bingo
