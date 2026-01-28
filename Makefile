@@ -4,7 +4,8 @@ MAKEFLAGS += --silent
 buildBingo:
 	cd bingo && \
 	npm i && \
-	npm run build
+	npm run build && \
+	cd ..
 
 buildFunctions:
 	cd functions/bin && \
@@ -21,9 +22,11 @@ buildSwitch:
 	npm run build
 
 copyBuilds:
+	mkdir -p build
 	mv bingo/build build/bingo
 	mv pokemon-list/build build/pokemon-list
 	mv switch/build build/switch
+	cp homepage/* build/
 
 build: buildBingo buildFunctions buildPokemonList buildSwitch copyBuilds
 
