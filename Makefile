@@ -10,11 +10,6 @@ buildFunctions:
 	cd functions/bin && \
 	npm i
 
-buildHungerGames:
-	cd hunger-games && \
-	npm i && \
-	npm run build
-
 buildPokemonList:
 	cd pokemon-list && \
 	npm i && \
@@ -27,7 +22,6 @@ buildSwitch:
 
 copyBuilds:
 	mv bingo/build build/bingo
-	mv hunger-games/build build/hunger-games
 	mv pokemon-list/build build/pokemon-list
 	mv switch/build build/switch
 
