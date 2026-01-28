@@ -25,6 +25,6 @@ copyBuilds:
 	mv pokemon-list/build build/pokemon-list
 	mv switch/build build/switch
 
-build: buildBingo buildFunctions buildHungerGames buildPokemonList buildSwitch copyBuilds
+build: buildBingo buildFunctions buildPokemonList buildSwitch copyBuilds
 
 .PHONY: build
