@@ -1,5 +1,5 @@
 import fetchJsonp from "fetch-jsonp";
-import cheerio from "cheerio";
+import { load } from "cheerio";
 
 export const REGIONS = {
 	EU: "Europe",
@@ -13,10 +13,10 @@ PRICE[500] = PRICE[250] + "%20OR%20price_lowest_f%3A%5B2.5%20TO%204.99%5D";
 
 export const getMetacritic = (name) =>
 	fetch(
-		`https://cors-anywhere.herokuapp.com/https://www.metacritic.com/search/game/${name}/results?plats[268409]=1&search_type=advanced`
+		`https://cors-anywhere.herokuapp.com/https://www.metacritic.com/search/game/${name}/results?plats[268409]=1&search_type=advanced`,
 	)
 		.then((res) => res.text())
-		.then((html) => cheerio.load(html))
+		.then((html) => load(html))
 		.then(($) => {
 			return {
 				score: $(".metascore_w")[0] && $(".metascore_w")[0].children[0].data,
@@ -50,7 +50,7 @@ export const regions = {
 				Math.round(
 					(game.price_sorting_f / (100 - game.price_discount_percentage_f)) *
 						100 *
-						100
+						100,
 				) / 100,
 			discount: game.price_discount_percentage_f,
 		}),
@@ -58,7 +58,7 @@ export const regions = {
 	[REGIONS.NA]: {
 		fetch: (num, getUrl, method, getBody) =>
 			fetch(getUrl(num), { method, body: JSON.stringify(getBody(num)) }).then(
-				(res) => res.json()
+				(res) => res.json(),
 			),
 		getURL: () =>
 			`https://u3b6gr4ua3-dsn.algolia.net/1/indexes/*/queries?x-algolia-agent=Algolia%20for%20JavaScript%20(3.33.0)%3B%20Browser%20(lite)%3B%20JS%20Helper%202.20.1&x-algolia-application-id=U3B6GR4UA3&x-algolia-api-key=9a20c93440cf63cf1a7008d75f7438bf`,
