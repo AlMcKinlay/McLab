@@ -132,12 +132,12 @@ bot.catch((err, ctx) => {
 
 // Start the bot with error handling and retry logic
 async function startBot() {
-	const maxRetries = 3;
+	const maxRetries = 5;
 	let retries = 0;
 
 	while (retries < maxRetries) {
 		try {
-			bot.launch(async () => {
+			await bot.launch(async () => {
 				console.log(
 					`[${new Date().toISOString()}] ✅ Bot successfully connected to Telegram API`,
 				);
@@ -171,11 +171,14 @@ async function startBot() {
 			break;
 		} catch (error) {
 			retries++;
-			const waitTime = Math.min(1000 * Math.pow(2, retries - 1), 10000);
+			const waitTime = Math.min(1000 * Math.pow(2, retries - 1), 30000);
 			console.error(
 				`[${new Date().toISOString()}] ❌ Failed to start bot (attempt ${retries}/${maxRetries}): ${
 					error.message
 				}`,
+			);
+			console.error(
+				`[${new Date().toISOString()}] Error details: ${error.code || "N/A"} - ${error.errno || "N/A"}`,
 			);
 
 			if (retries < maxRetries) {
