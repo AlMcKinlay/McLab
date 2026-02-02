@@ -108,7 +108,7 @@ function formatMonthEmojiGrid(monthData) {
 		rows.push(cells.slice(i, i + 7).join(" "));
 	}
 
-	return `🗓️ <b>${monthLabel}</b>\nMon Tue Wed Thu Fri Sat Sun\n${rows.join("\n")}`;
+	return `🗓️ <b>${monthLabel}</b>\n M   T   W   Th   F   Sa  Su\n${rows.join("\n")}`;
 }
 
 export function registerNathanCommands(bot) {
