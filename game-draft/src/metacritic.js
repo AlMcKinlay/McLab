@@ -31,17 +31,14 @@ const namesMatch = (searchName, foundName) => {
 };
 
 // Fetch Metacritic score for a game
-// Uses corsproxy.io which has better CORS support
+// Uses Netlify function proxy to avoid CORS restrictions in production
 // Returns an object with { score: number|null, isTbd: boolean }
 export const fetchMetacriticScore = async (gameName) => {
 	try {
-		// Use corsproxy.io instead
-		const proxyUrl = "https://corsproxy.io/?";
-		const metacriticUrl = encodeURIComponent(
-			`https://www.metacritic.com/search/${encodeURIComponent(gameName)}/`,
-		);
+		const functionsBase = process.env.REACT_APP_FUNCTIONS_BASE || "";
+		const proxyUrl = `${functionsBase}/.netlify/functions/metacritic-proxy?game=${encodeURIComponent(gameName)}`;
 
-		const response = await fetch(proxyUrl + metacriticUrl, {
+		const response = await fetch(proxyUrl, {
 			headers: {
 				Accept: "text/html",
 			},
