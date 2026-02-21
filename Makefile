@@ -21,14 +21,21 @@ buildSwitch:
 	npm i && \
 	npm run build
 
+buildGameDraft:
+	cd game-draft && \
+	npm i && \
+	npm run build && \
+	cd ..
+
 copyBuilds:
 	rm -rf build
 	mkdir -p build
 	mv bingo/build build/bingo
 	mv pokemon-list/build build/pokemon-list
 	mv switch/build build/switch
+	mv game-draft/build build/game-draft
 	cp homepage/* build/
-
+buildGameDraft 
 build: buildBingo buildFunctions buildPokemonList buildSwitch copyBuilds
 
 .PHONY: build
