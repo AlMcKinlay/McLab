@@ -1,12 +1,27 @@
 import React, { useState, useEffect } from "react";
-import "./App.css";
 import { fetchMetacriticScore } from "./metacritic";
+import "./App.css";
 
 function App() {
 	const [users, setUsers] = useState([]);
 	const [results, setResults] = useState(null);
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState(null);
+	const [theme, setTheme] = useState(() => {
+		// Check localStorage first
+		const savedTheme = localStorage.getItem("gameDraftTheme");
+		if (savedTheme) {
+			return savedTheme;
+		}
+		// Otherwise detect system preference
+		if (
+			window.matchMedia &&
+			window.matchMedia("(prefers-color-scheme: dark)").matches
+		) {
+			return "dark";
+		}
+		return "light";
+	});
 
 	// Load data from localStorage on mount
 	useEffect(() => {
@@ -27,6 +42,17 @@ function App() {
 			localStorage.setItem("gameDraftData", JSON.stringify(users));
 		}
 	}, [users]);
+
+	// Apply theme via data attribute on body
+	useEffect(() => {
+		document.body.setAttribute("data-theme", theme);
+		localStorage.setItem("gameDraftTheme", theme);
+	}, [theme]);
+
+	// Toggle between light and dark theme
+	const toggleTheme = () => {
+		setTheme(theme === "dark" ? "light" : "dark");
+	};
 
 	// Add a new user
 	const addUser = () => {
@@ -148,6 +174,15 @@ function App() {
 
 	return (
 		<div className="app-container">
+			<button
+				className="theme-toggle"
+				onClick={toggleTheme}
+				aria-label="Toggle theme"
+				title={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
+			>
+				{theme === "dark" ? "☀️" : "🌙"}
+			</button>
+
 			<h1>Game Draft Scorer</h1>
 
 			{!results && (

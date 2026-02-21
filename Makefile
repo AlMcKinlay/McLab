@@ -35,7 +35,7 @@ copyBuilds:
 	mv switch/build build/switch
 	mv game-draft/build build/game-draft
 	cp homepage/* build/
-buildGameDraft 
-build: buildBingo buildFunctions buildPokemonList buildSwitch copyBuilds
+
+build: buildBingo buildFunctions buildPokemonList buildSwitch buildGameDraft copyBuilds
 
 .PHONY: build

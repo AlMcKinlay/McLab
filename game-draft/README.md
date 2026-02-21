@@ -6,9 +6,13 @@ A web app for tracking Metacritic scores in a fantasy game draft.
 
 - Add multiple players with 5 games each
 - Automatically fetch Metacritic scores for games
-- Manually edit scores that couldn't be fetched
 - Calculate total scores for each player
 - All data persists in browser localStorage
+- **4 visual themes to choose from:**
+  - **Classic Purple**: Original gradient purple design with smooth shadows
+  - **Clean Minimal**: Light, minimalist design with subtle borders
+  - **Dark Mode**: Dark background with cyan accents and glowing effects
+  - **Neon Gaming**: Bold, cyberpunk-inspired theme with neon colors
 
 ## Usage
 
