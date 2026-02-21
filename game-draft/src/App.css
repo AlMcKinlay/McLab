@@ -1,4 +1,11 @@
 /* Base styles that apply to all themes */
+html,
+body {
+	min-height: 100%;
+	background-repeat: no-repeat;
+	background-attachment: fixed;
+}
+
 .app-container {
 	max-width: 1000px;
 	margin: 0 auto;
