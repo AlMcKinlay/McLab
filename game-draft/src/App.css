@@ -4,6 +4,7 @@ body {
 	min-height: 100%;
 	background-repeat: no-repeat;
 	background-attachment: fixed;
+	color-scheme: light dark;
 }
 
 .app-container {
@@ -244,6 +245,7 @@ h2 {
 body[data-theme="dark"] {
 	background: linear-gradient(135deg, #0a1128 0%, #1c2541 50%, #0a1128 100%);
 	color: #c9d1d9;
+	color-scheme: dark;
 }
 
 body[data-theme="dark"] h1 {
@@ -377,6 +379,7 @@ body[data-theme="dark"] .total-score {
 body[data-theme="light"] {
 	background: linear-gradient(135deg, #e6f0ff 0%, #f0f4ff 50%, #e6f0ff 100%);
 	color: #24292f;
+	color-scheme: light;
 }
 
 body[data-theme="light"] h1 {
