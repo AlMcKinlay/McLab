@@ -99,6 +99,12 @@ h2 {
 	margin-top: 1rem;
 }
 
+.share-message {
+	padding: 1rem;
+	border-radius: 4px;
+	margin-top: 1rem;
+}
+
 .results-section {
 	border-radius: 8px;
 	padding: 1.5rem 2rem 2rem;
@@ -303,6 +309,12 @@ body[data-theme="dark"] .error-message {
 	border: 1px solid rgba(248, 81, 73, 0.3);
 }
 
+body[data-theme="dark"] .share-message {
+	background: rgba(88, 166, 255, 0.12);
+	color: #79c0ff;
+	border: 1px solid rgba(88, 166, 255, 0.35);
+}
+
 body[data-theme="dark"] .result-card {
 	background: linear-gradient(
 		135deg,
@@ -430,6 +442,12 @@ body[data-theme="light"] .error-message {
 	background: rgba(207, 34, 46, 0.1);
 	color: #a40e26;
 	border: 1px solid rgba(207, 34, 46, 0.3);
+}
+
+body[data-theme="light"] .share-message {
+	background: rgba(9, 105, 218, 0.1);
+	color: #0969da;
+	border: 1px solid rgba(9, 105, 218, 0.25);
 }
 
 body[data-theme="light"] .result-card {
