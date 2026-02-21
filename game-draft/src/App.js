@@ -7,6 +7,7 @@ function App() {
 	const [results, setResults] = useState(null);
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState(null);
+	const [shareStatus, setShareStatus] = useState(null);
 	const [theme, setTheme] = useState(() => {
 		// Check localStorage first
 		const savedTheme = localStorage.getItem("gameDraftTheme");
@@ -23,8 +24,54 @@ function App() {
 		return "light";
 	});
 
-	// Load data from localStorage on mount
+	const encodeShareData = (data) => {
+		const json = JSON.stringify(data);
+		const bytes = new TextEncoder().encode(json);
+		let binary = "";
+		bytes.forEach((b) => {
+			binary += String.fromCharCode(b);
+		});
+		return btoa(binary)
+			.replace(/\+/g, "-")
+			.replace(/\//g, "_")
+			.replace(/=+$/g, "");
+	};
+
+	const decodeShareData = (encoded) => {
+		let base64 = encoded.replace(/-/g, "+").replace(/_/g, "/");
+		while (base64.length % 4) {
+			base64 += "=";
+		}
+		const binary = atob(base64);
+		const bytes = Uint8Array.from(binary, (c) => c.charCodeAt(0));
+		const json = new TextDecoder().decode(bytes);
+		return JSON.parse(json);
+	};
+
+	// Load data from URL or localStorage on mount
 	useEffect(() => {
+		const params = new URLSearchParams(window.location.search);
+		const sharedData = params.get("data");
+		if (sharedData) {
+			try {
+				const parsed = decodeShareData(sharedData);
+				if (Array.isArray(parsed)) {
+					setUsers(parsed);
+					localStorage.setItem("gameDraftData", JSON.stringify(parsed));
+					const url = new URL(window.location.href);
+					url.searchParams.delete("data");
+					window.history.replaceState(null, "", url.toString());
+					return;
+				}
+			} catch (e) {
+				console.error("Error parsing shared data:", e);
+				setError("Shared link data is invalid.");
+				const url = new URL(window.location.href);
+				url.searchParams.delete("data");
+				window.history.replaceState(null, "", url.toString());
+			}
+		}
+
 		const savedData = localStorage.getItem("gameDraftData");
 		if (savedData) {
 			try {
@@ -52,6 +99,22 @@ function App() {
 	// Toggle between light and dark theme
 	const toggleTheme = () => {
 		setTheme(theme === "dark" ? "light" : "dark");
+	};
+
+	const handleShareLink = async () => {
+		setShareStatus(null);
+		try {
+			const encoded = encodeShareData(users);
+			const url = new URL(window.location.href);
+			url.searchParams.set("data", encoded);
+			window.history.replaceState(null, "", url.toString());
+
+			await navigator.clipboard.writeText(url.toString());
+			setShareStatus("Share link copied to clipboard.");
+		} catch (err) {
+			console.error("Error creating share link:", err);
+			setShareStatus("Share link is ready in your address bar.");
+		}
 	};
 
 	// Add a new user
@@ -233,6 +296,14 @@ function App() {
 						</button>
 
 						<button
+							onClick={handleShareLink}
+							disabled={users.length === 0}
+							className="btn btn-secondary"
+						>
+							Share Link
+						</button>
+
+						<button
 							onClick={handleCalculateScores}
 							disabled={!allFieldsFilled || loading || users.length === 0}
 							className="btn btn-primary"
@@ -240,6 +311,8 @@ function App() {
 							{loading ? "Calculating..." : "Calculate Scores"}
 						</button>
 					</div>
+
+					{shareStatus && <div className="share-message">{shareStatus}</div>}
 
 					{error && <div className="error-message">{error}</div>}
 				</div>
