@@ -118,6 +118,27 @@ h2 {
 	padding: 1rem;
 	border-radius: 4px;
 	margin-top: 1rem;
+	margin-bottom: 1.5rem;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1rem;
+	flex-wrap: wrap;
+}
+
+.share-prompt {
+	padding: 1rem;
+	border-radius: 6px;
+	margin-bottom: 1.5rem;
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+}
+
+.share-prompt-actions {
+	display: flex;
+	gap: 1rem;
+	flex-wrap: wrap;
 }
 
 .results-section {
@@ -331,6 +352,12 @@ body[data-theme="dark"] .share-message {
 	border: 1px solid rgba(88, 166, 255, 0.35);
 }
 
+body[data-theme="dark"] .share-prompt {
+	background: rgba(88, 166, 255, 0.1);
+	color: #c9d1d9;
+	border: 1px solid rgba(88, 166, 255, 0.35);
+}
+
 body[data-theme="dark"] .result-card {
 	background: linear-gradient(
 		135deg,
@@ -465,6 +492,12 @@ body[data-theme="light"] .share-message {
 	background: rgba(9, 105, 218, 0.1);
 	color: #0969da;
 	border: 1px solid rgba(9, 105, 218, 0.25);
+}
+
+body[data-theme="light"] .share-prompt {
+	background: rgba(9, 105, 218, 0.08);
+	color: #24292f;
+	border: 1px solid rgba(9, 105, 218, 0.2);
 }
 
 body[data-theme="light"] .result-card {

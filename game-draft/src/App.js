@@ -8,6 +8,10 @@ function App() {
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState(null);
 	const [shareStatus, setShareStatus] = useState(null);
+	const [pendingSharedUsers, setPendingSharedUsers] = useState(null);
+	const [savedUsers, setSavedUsers] = useState(null);
+	const [showSharePrompt, setShowSharePrompt] = useState(false);
+	const [viewOnly, setViewOnly] = useState(false);
 	const [theme, setTheme] = useState(() => {
 		// Check localStorage first
 		const savedTheme = localStorage.getItem("gameDraftTheme");
@@ -50,14 +54,29 @@ function App() {
 
 	// Load data from URL or localStorage on mount
 	useEffect(() => {
+		let saved = null;
 		const params = new URLSearchParams(window.location.search);
 		const sharedData = params.get("data");
 		if (sharedData) {
 			try {
 				const parsed = decodeShareData(sharedData);
 				if (Array.isArray(parsed)) {
-					setUsers(parsed);
-					localStorage.setItem("gameDraftData", JSON.stringify(parsed));
+					const savedData = localStorage.getItem("gameDraftData");
+					if (savedData) {
+						try {
+							saved = JSON.parse(savedData);
+							setSavedUsers(saved);
+							setPendingSharedUsers(parsed);
+							setShowSharePrompt(true);
+						} catch (e) {
+							console.error("Error parsing localStorage data:", e);
+							setUsers(parsed);
+							localStorage.setItem("gameDraftData", JSON.stringify(parsed));
+						}
+					} else {
+						setUsers(parsed);
+						localStorage.setItem("gameDraftData", JSON.stringify(parsed));
+					}
 					const url = new URL(window.location.href);
 					url.searchParams.delete("data");
 					window.history.replaceState(null, "", url.toString());
@@ -77,6 +96,7 @@ function App() {
 			try {
 				const parsed = JSON.parse(savedData);
 				setUsers(parsed);
+				setSavedUsers(parsed);
 			} catch (e) {
 				console.error("Error parsing localStorage data:", e);
 			}
@@ -85,10 +105,10 @@ function App() {
 
 	// Save to localStorage whenever users change (but not on initial empty state)
 	useEffect(() => {
-		if (users.length > 0) {
+		if (users.length > 0 && !viewOnly) {
 			localStorage.setItem("gameDraftData", JSON.stringify(users));
 		}
-	}, [users]);
+	}, [users, viewOnly]);
 
 	// Apply theme via data attribute on body
 	useEffect(() => {
@@ -114,6 +134,33 @@ function App() {
 			console.error("Error creating share link:", err);
 			setShareStatus("Share link is ready in your address bar.");
 		}
+	};
+
+	const handleSharedOverwrite = () => {
+		if (pendingSharedUsers) {
+			setUsers(pendingSharedUsers);
+			setSavedUsers(pendingSharedUsers);
+			localStorage.setItem("gameDraftData", JSON.stringify(pendingSharedUsers));
+		}
+		setViewOnly(false);
+		setPendingSharedUsers(null);
+		setShowSharePrompt(false);
+	};
+
+	const handleSharedViewOnly = () => {
+		if (pendingSharedUsers) {
+			setUsers(pendingSharedUsers);
+		}
+		setViewOnly(true);
+		setPendingSharedUsers(null);
+		setShowSharePrompt(false);
+	};
+
+	const handleExitViewOnly = () => {
+		if (savedUsers) {
+			setUsers(savedUsers);
+		}
+		setViewOnly(false);
 	};
 
 	// Add a new user
@@ -250,6 +297,41 @@ function App() {
 			{!results && (
 				<div className="form-section">
 					<h2>Enter Players & Games</h2>
+
+					{showSharePrompt && pendingSharedUsers && (
+						<div className="share-prompt">
+							<p>
+								This link contains shared data. You already have saved data.
+								What would you like to do?
+							</p>
+							<div className="share-prompt-actions">
+								<button
+									onClick={handleSharedOverwrite}
+									className="btn btn-primary"
+								>
+									Overwrite Saved Data
+								</button>
+								<button
+									onClick={handleSharedViewOnly}
+									className="btn btn-secondary"
+								>
+									View Without Saving
+								</button>
+							</div>
+						</div>
+					)}
+
+					{viewOnly && (
+						<div className="share-message">
+							Viewing shared data. Your saved data has not been changed.
+							<button
+								onClick={handleExitViewOnly}
+								className="btn btn-secondary"
+							>
+								Exit View-Only
+							</button>
+						</div>
+					)}
 
 					<div className="users-list">
 						{users.map((user) => (
