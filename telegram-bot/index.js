@@ -2,6 +2,7 @@ import { Telegraf } from "telegraf";
 import { message } from "telegraf/filters";
 import { config } from "./config.js";
 import { registerNathanCommands } from "./commands/nathan.js";
+import { initializeScheduler } from "./scheduler.js";
 
 const bot = new Telegraf(config.botToken);
 
@@ -45,6 +46,7 @@ bot.use((ctx, next) => {
 		"unknown";
 
 	console.log(`[${timestamp}] 📨 ${userName} in ${chatInfo}: ${msgInfo}`);
+	console.log(`Chat ID: ${ctx.chat.id}`);
 
 	return next().catch((error) => {
 		console.error(
@@ -169,6 +171,9 @@ async function startBot() {
 					);
 					// This is not critical, bot can still function
 				}
+
+				// Initialize daily scheduler
+				initializeScheduler(bot);
 			});
 			break;
 		} catch (error) {
