@@ -21,6 +21,13 @@ const apps = [
 		url: "/bingo",
 		thumbnail: "./bingo-thumbnail.png",
 	},
+	{
+		id: "game-draft",
+		title: "Game Draft",
+		description: "Track Metacritic scores for your fantasy game draft",
+		url: "/game-draft",
+		thumbnail: "./game-draft-thumbnail.png",
+	},
 ];
 
 // DOM Elements

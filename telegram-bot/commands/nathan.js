@@ -1,5 +1,10 @@
 import { message } from "telegraf/filters";
-import { updateNathanSheet, checkTodayFilled } from "../apis/notion.js";
+import {
+	updateNathanSheet,
+	checkTodayFilled,
+	getLastNDaysStatuses,
+	getMonthStatuses,
+} from "../apis/notion.js";
 
 const pendingConfirmations = new Map();
 
@@ -55,6 +60,57 @@ async function performUpdate(ctx, rating, userName, editMessage = false) {
 	}
 }
 
+function formatLastDaysEmoji(statuses) {
+	const emojiLine = statuses
+		.map((entry) => {
+			if (entry.rating === "good") return "🟩";
+			if (entry.rating === "ok") return "🟧";
+			if (entry.rating === "bad") return "🟥";
+			if (entry.rating === "unknown") return "❓";
+			return "⬜️";
+		})
+		.join("");
+
+	return `🗓️ <b>Last 7 days</b>\n\n${emojiLine}`;
+}
+
+function formatMonthEmojiGrid(monthData) {
+	const { monthLabel, monthIndex, year, daysInMonth, statuses } = monthData;
+	const statusMap = new Map(statuses.map((entry) => [entry.day, entry.rating]));
+	const today = new Date();
+	const isCurrentMonth =
+		today.getFullYear() === year && today.getMonth() === monthIndex;
+	const todayDate = isCurrentMonth ? today.getDate() : 0;
+
+	const firstDay = new Date(year, monthIndex, 1);
+	const mondayStartOffset = (firstDay.getDay() + 6) % 7;
+
+	const cells = [];
+	for (let i = 0; i < mondayStartOffset; i++) {
+		cells.push("▫️");
+	}
+
+	for (let day = 1; day <= daysInMonth; day++) {
+		if (isCurrentMonth && day > todayDate) {
+			cells.push("⬛");
+			continue;
+		}
+		const rating = statusMap.get(day);
+		if (rating === "good") cells.push("🟩");
+		else if (rating === "ok") cells.push("🟧");
+		else if (rating === "bad") cells.push("🟥");
+		else if (rating === "unknown") cells.push("❓");
+		else cells.push("⬜️");
+	}
+
+	const rows = [];
+	for (let i = 0; i < cells.length; i += 7) {
+		rows.push(cells.slice(i, i + 7).join(" "));
+	}
+
+	return `🗓️ <b>${monthLabel}</b>\n M   T   W   Th   F   Sa  Su\n${rows.join("\n")}`;
+}
+
 export function registerNathanCommands(bot) {
 	// Helper function to show rating buttons
 	async function showRatingButtons(ctx) {
@@ -76,9 +132,87 @@ export function registerNathanCommands(bot) {
 		await showRatingButtons(ctx);
 	});
 
-	// /nathan command
-	bot.command("nathan", async (ctx) => {
-		await showRatingButtons(ctx);
+	// Handle keyboard button for last 7 days
+	bot.hears("🗓️ Last 7 Days", async (ctx) => {
+		await withTimeout(ctx.sendChatAction("typing"), 5000, "sendChatAction");
+		const statuses = await withTimeout(
+			getLastNDaysStatuses(7),
+			10000,
+			"getLastNDaysStatuses",
+		);
+
+		if (!statuses.length) {
+			await withTimeout(
+				ctx.reply("No recent entries found."),
+				5000,
+				"reply_no_entries",
+			);
+			return;
+		}
+
+		const message = formatLastDaysEmoji(statuses);
+		await withTimeout(
+			ctx.reply(message, { parse_mode: "HTML" }),
+			5000,
+			"reply_last7",
+		);
+	});
+
+	// Handle keyboard button for current month
+	bot.hears("🗓️ This Month", async (ctx) => {
+		await withTimeout(ctx.sendChatAction("typing"), 5000, "sendChatAction");
+		const monthData = await withTimeout(
+			getMonthStatuses(),
+			10000,
+			"getMonthStatuses",
+		);
+
+		if (!monthData) {
+			await withTimeout(
+				ctx.reply("No data found for the current month."),
+				5000,
+				"reply_no_month",
+			);
+			return;
+		}
+
+		const message = formatMonthEmojiGrid(monthData);
+		await withTimeout(
+			ctx.reply(message, { parse_mode: "HTML" }),
+			5000,
+			"reply_month",
+		);
+	});
+
+	// Handle keyboard button for current month
+	bot.hears("🗓️ Last Month", async (ctx) => {
+		await withTimeout(ctx.sendChatAction("typing"), 5000, "sendChatAction");
+
+		// Get last month's date
+		const lastMonth = new Date();
+		lastMonth.setMonth(lastMonth.getMonth() - 1);
+
+		const monthData = await withTimeout(
+			getMonthStatuses(lastMonth),
+			10000,
+			"getMonthStatuses",
+		);
+
+		if (!monthData) {
+			await withTimeout(
+				ctx.reply("No data found for last month."),
+				5000,
+				"reply_no_month",
+			);
+			return;
+		}
+
+		const message = formatMonthEmojiGrid(monthData);
+		await withTimeout(
+			ctx.reply(message, { parse_mode: "HTML" }),
+			5000,
+			"reply_month",
+		);
 	});
 
 	// Rating button clicks

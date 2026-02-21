@@ -2,6 +2,7 @@ import { Telegraf } from "telegraf";
 import { message } from "telegraf/filters";
 import { config } from "./config.js";
 import { registerNathanCommands } from "./commands/nathan.js";
+import { initializeScheduler } from "./scheduler.js";
 
 const bot = new Telegraf(config.botToken);
 
@@ -45,6 +46,7 @@ bot.use((ctx, next) => {
 		"unknown";
 
 	console.log(`[${timestamp}] 📨 ${userName} in ${chatInfo}: ${msgInfo}`);
+	console.log(`Chat ID: ${ctx.chat.id}`);
 
 	return next().catch((error) => {
 		console.error(
@@ -67,12 +69,15 @@ bot.use((ctx, next) => {
 bot.command("start", (ctx) => {
 	ctx.reply(
 		`👋 Hello! I'm the Nathan Sheet bot.\n\n` +
-			`Available commands:\n` +
-			`/nathan - Rate your day\n` +
 			`/help - Show available commands`,
 		{
 			reply_markup: {
-				keyboard: [[{ text: "📊 Set Nathan Status" }]],
+				keyboard: [
+					[{ text: "📊 Set Nathan Status" }],
+					[{ text: "🗓️ Last 7 Days" }],
+					[{ text: "🗓️ This Month" }],
+					[{ text: "🗓️ Last Month" }],
+				],
 				resize_keyboard: true,
 				one_time_keyboard: false,
 			},
@@ -82,19 +87,19 @@ bot.command("start", (ctx) => {
 
 // Help command
 bot.command("help", (ctx) => {
-	ctx.reply(
-		`📋 **Available Commands:**\n\n` +
-			`/nathan - Rate your day\n` +
-			`/help - Show this message`,
-		{
-			parse_mode: "HTML",
-			reply_markup: {
-				keyboard: [[{ text: "📊 Set Nathan Status" }]],
-				resize_keyboard: true,
-				one_time_keyboard: false,
-			},
+	ctx.reply(`📋 **Available Commands:**\n\n` + `/help - Show this message`, {
+		parse_mode: "HTML",
+		reply_markup: {
+			keyboard: [
+				[{ text: "📊 Set Nathan Status" }],
+				[{ text: "🗓️ Last 7 Days" }],
+				[{ text: "🗓️ This Month" }],
+				[{ text: "🗓️ Last Month" }],
+			],
+			resize_keyboard: true,
+			one_time_keyboard: false,
 		},
-	);
+	});
 });
 
 // Register command handlers
@@ -145,7 +150,6 @@ async function startBot() {
 				// Set up menu commands after successful launch
 				try {
 					await bot.telegram.setMyCommands([
-						{ command: "nathan", description: "Rate your day" },
 						{ command: "help", description: "Show available commands" },
 					]);
 
@@ -167,6 +171,9 @@ async function startBot() {
 					);
 					// This is not critical, bot can still function
 				}
+
+				// Initialize daily scheduler
+				initializeScheduler(bot);
 			});
 			break;
 		} catch (error) {

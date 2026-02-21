@@ -1,0 +1,477 @@
+/* Base styles that apply to all themes */
+.app-container {
+	max-width: 1000px;
+	margin: 0 auto;
+	padding: 2rem;
+}
+
+h1 {
+	text-align: center;
+	margin-bottom: 2rem;
+	margin-top: 0;
+	font-size: 2.5rem;
+}
+
+h2 {
+	border-bottom: 2px solid var(--border-color);
+	padding-bottom: 0.5rem;
+	margin-bottom: 1.5rem;
+	margin-top: 0;
+}
+
+.form-section {
+	border-radius: 8px;
+	padding: 2rem;
+}
+
+.users-list {
+	margin-bottom: 2rem;
+}
+
+.user-card {
+	border-radius: 6px;
+	padding: 1rem;
+	margin-bottom: 1.5rem;
+}
+
+.user-header {
+	display: flex;
+	gap: 0.5rem;
+	margin-bottom: 1rem;
+	align-items: center;
+}
+
+.user-name-input {
+	flex: 1;
+	padding: 0.75rem;
+	font-size: 1rem;
+	border-radius: 4px;
+	font-weight: bold;
+}
+
+.remove-btn {
+	border: none;
+	border-radius: 4px;
+	padding: 0.5rem 0.75rem;
+	font-size: 1rem;
+	cursor: pointer;
+	transition: all 0.2s;
+}
+
+.games-list {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+	gap: 0.75rem;
+}
+
+.game-input {
+	padding: 0.75rem;
+	font-size: 0.95rem;
+	border-radius: 4px;
+	font-family: inherit;
+}
+
+.button-group {
+	display: flex;
+	gap: 1rem;
+	justify-content: center;
+	flex-wrap: wrap;
+}
+
+.btn {
+	padding: 0.75rem 1.5rem;
+	font-size: 1rem;
+	border: none;
+	border-radius: 4px;
+	cursor: pointer;
+	font-weight: 600;
+	transition: all 0.2s;
+}
+
+.btn-primary:disabled {
+	cursor: not-allowed;
+	opacity: 0.6;
+}
+
+.error-message {
+	padding: 1rem;
+	border-radius: 4px;
+	margin-top: 1rem;
+}
+
+.results-section {
+	border-radius: 8px;
+	padding: 1.5rem 2rem 2rem;
+}
+
+.results-section .error-message {
+	margin-bottom: 2rem;
+}
+
+.results-list {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+	gap: 2rem;
+	margin-bottom: 2rem;
+}
+
+.result-card {
+	padding: 1.5rem;
+	border-radius: 6px;
+}
+
+.result-card h3 {
+	margin: 0 0 1.5rem 0;
+	font-size: 1.5rem;
+	padding-bottom: 0.5rem;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.game-scores {
+	margin-bottom: 1.5rem;
+}
+
+.game-score-row {
+	display: flex;
+	justify-content: space-between;
+	margin-bottom: 0.75rem;
+	padding-bottom: 0.5rem;
+}
+
+.game-name {
+	flex: 1;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.game-score {
+	font-weight: bold;
+	min-width: 50px;
+	text-align: right;
+}
+
+.user-total {
+	display: flex;
+	justify-content: space-between;
+	font-size: 1.25rem;
+	padding-top: 1rem;
+}
+
+.total-score {
+	font-size: 1.75rem;
+}
+
+@media (max-width: 768px) {
+	.app-container {
+		padding: 1rem;
+	}
+
+	h1 {
+		font-size: 2rem;
+	}
+
+	.form-section,
+	.results-section {
+		padding: 1rem;
+	}
+
+	.games-list {
+		grid-template-columns: 1fr;
+	}
+
+	.results-list {
+		grid-template-columns: 1fr;
+		gap: 1.5rem;
+	}
+
+	.button-group {
+		flex-direction: column;
+	}
+
+	.btn {
+		width: 100%;
+	}
+}
+
+/* Theme Toggle Button */
+.theme-toggle {
+	position: fixed;
+	top: 1rem;
+	right: 1rem;
+	background: rgba(128, 128, 128, 0.3);
+	border: 1px solid rgba(128, 128, 128, 0.5);
+	border-radius: 50%;
+	width: 3rem;
+	height: 3rem;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 1.5rem;
+	transition: all 0.3s;
+	z-index: 1000;
+}
+
+.theme-toggle:hover {
+	background: rgba(128, 128, 128, 0.5);
+	transform: scale(1.1);
+}
+
+/* THEME: Navy Professional Dark */
+body[data-theme="dark"] {
+	background: linear-gradient(135deg, #0a1128 0%, #1c2541 50%, #0a1128 100%);
+	color: #c9d1d9;
+}
+
+body[data-theme="dark"] h1 {
+	color: #e6edf3;
+	font-weight: 600;
+	letter-spacing: 1px;
+}
+
+body[data-theme="dark"] h2 {
+	color: #79c0ff;
+	border-bottom-color: #21262d;
+}
+
+body[data-theme="dark"] .form-section,
+body[data-theme="dark"] .results-section {
+	background: rgba(22, 27, 34, 0.9);
+	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+	border: 1px solid #30363d;
+}
+
+body[data-theme="dark"] .user-card {
+	background: rgba(13, 17, 23, 0.7);
+	border: 1px solid #30363d;
+}
+
+body[data-theme="dark"] .user-name-input,
+body[data-theme="dark"] .game-input {
+	background: rgba(13, 17, 23, 0.9);
+	color: #c9d1d9;
+	border: 1px solid #30363d;
+}
+
+body[data-theme="dark"] .user-name-input:focus,
+body[data-theme="dark"] .game-input:focus {
+	outline: none;
+	border-color: #58a6ff;
+	box-shadow: 0 0 0 2px rgba(88, 166, 255, 0.2);
+}
+
+body[data-theme="dark"] .remove-btn {
+	background: #da3633;
+	color: white;
+}
+
+body[data-theme="dark"] .remove-btn:hover {
+	background: #f85149;
+}
+
+body[data-theme="dark"] .btn-primary {
+	background: #238636;
+	color: white;
+}
+
+body[data-theme="dark"] .btn-primary:hover:not(:disabled) {
+	background: #2ea043;
+	transform: translateY(-1px);
+	box-shadow: 0 4px 12px rgba(46, 160, 67, 0.3);
+}
+
+body[data-theme="dark"] .btn-primary:disabled {
+	background: #21262d;
+}
+
+body[data-theme="dark"] .btn-secondary {
+	background: rgba(22, 27, 34, 0.9);
+	color: #79c0ff;
+	border: 1px solid #30363d;
+}
+
+body[data-theme="dark"] .btn-secondary:hover {
+	background: #30363d;
+}
+
+body[data-theme="dark"] .error-message {
+	background: rgba(248, 81, 73, 0.15);
+	color: #ff7b72;
+	border: 1px solid rgba(248, 81, 73, 0.3);
+}
+
+body[data-theme="dark"] .result-card {
+	background: linear-gradient(
+		135deg,
+		rgba(22, 27, 34, 0.8) 0%,
+		rgba(13, 17, 23, 0.8) 100%
+	);
+	color: #c9d1d9;
+	border: 1px solid #30363d;
+	box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+}
+
+body[data-theme="dark"] .result-card:hover {
+	border-color: #58a6ff;
+	box-shadow: 0 6px 20px rgba(88, 166, 255, 0.2);
+	transform: translateY(-3px);
+}
+
+body[data-theme="dark"] .result-card h3 {
+	border-bottom: 2px solid #30363d;
+	color: #e6edf3;
+}
+
+body[data-theme="dark"] .game-name {
+	color: #8b949e;
+}
+
+body[data-theme="dark"] .game-score {
+	font-weight: 700;
+	color: #79c0ff;
+}
+
+body[data-theme="dark"] .game-score-row {
+	border-bottom: 1px solid #21262d;
+}
+
+body[data-theme="dark"] .user-total {
+	border-top: 2px solid #30363d;
+}
+
+body[data-theme="dark"] .total-score {
+	color: #79c0ff;
+	font-weight: 700;
+}
+
+/* THEME: Navy Professional Light */
+body[data-theme="light"] {
+	background: linear-gradient(135deg, #e6f0ff 0%, #f0f4ff 50%, #e6f0ff 100%);
+	color: #24292f;
+}
+
+body[data-theme="light"] h1 {
+	color: #0a1128;
+	font-weight: 600;
+	letter-spacing: 1px;
+}
+
+body[data-theme="light"] h2 {
+	color: #0969da;
+	border-bottom-color: #d0d7de;
+}
+
+body[data-theme="light"] .form-section,
+body[data-theme="light"] .results-section {
+	background: rgba(255, 255, 255, 0.95);
+	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+	border: 1px solid #d0d7de;
+}
+
+body[data-theme="light"] .user-card {
+	background: rgba(246, 248, 250, 0.9);
+	border: 1px solid #d0d7de;
+}
+
+body[data-theme="light"] .user-name-input,
+body[data-theme="light"] .game-input {
+	background: white;
+	color: #24292f;
+	border: 1px solid #d0d7de;
+}
+
+body[data-theme="light"] .user-name-input:focus,
+body[data-theme="light"] .game-input:focus {
+	outline: none;
+	border-color: #0969da;
+	box-shadow: 0 0 0 2px rgba(9, 105, 218, 0.15);
+}
+
+body[data-theme="light"] .remove-btn {
+	background: #cf222e;
+	color: white;
+}
+
+body[data-theme="light"] .remove-btn:hover {
+	background: #a40e26;
+}
+
+body[data-theme="light"] .btn-primary {
+	background: #1a7f37;
+	color: white;
+}
+
+body[data-theme="light"] .btn-primary:hover:not(:disabled) {
+	background: #116329;
+	transform: translateY(-1px);
+	box-shadow: 0 4px 12px rgba(26, 127, 55, 0.3);
+}
+
+body[data-theme="light"] .btn-primary:disabled {
+	background: #d0d7de;
+	color: #8c959f;
+}
+
+body[data-theme="light"] .btn-secondary {
+	background: white;
+	color: #0969da;
+	border: 1px solid #d0d7de;
+}
+
+body[data-theme="light"] .btn-secondary:hover {
+	background: #f6f8fa;
+	border-color: #0969da;
+}
+
+body[data-theme="light"] .error-message {
+	background: rgba(207, 34, 46, 0.1);
+	color: #a40e26;
+	border: 1px solid rgba(207, 34, 46, 0.3);
+}
+
+body[data-theme="light"] .result-card {
+	background: linear-gradient(
+		135deg,
+		rgba(255, 255, 255, 0.95) 0%,
+		rgba(246, 248, 250, 0.95) 100%
+	);
+	color: #24292f;
+	border: 1px solid #d0d7de;
+	box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+body[data-theme="light"] .result-card:hover {
+	border-color: #0969da;
+	box-shadow: 0 6px 20px rgba(9, 105, 218, 0.15);
+	transform: translateY(-3px);
+}
+
+body[data-theme="light"] .result-card h3 {
+	border-bottom: 2px solid #d0d7de;
+	color: #0a1128;
+}
+
+body[data-theme="light"] .game-name {
+	color: #57606a;
+}
+
+body[data-theme="light"] .game-score {
+	font-weight: 700;
+	color: #0969da;
+}
+
+body[data-theme="light"] .game-score-row {
+	border-bottom: 1px solid #d0d7de;
+}
+
+body[data-theme="light"] .user-total {
+	border-top: 2px solid #d0d7de;
+}
+
+body[data-theme="light"] .total-score {
+	color: #0969da;
+	font-weight: 700;
+}
