@@ -107,7 +107,6 @@ function App() {
 			const encoded = encodeShareData(users);
 			const url = new URL(window.location.href);
 			url.searchParams.set("data", encoded);
-			window.history.replaceState(null, "", url.toString());
 
 			await navigator.clipboard.writeText(url.toString());
 			setShareStatus("Share link copied to clipboard.");
