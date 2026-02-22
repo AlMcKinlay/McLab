@@ -1,28 +1,129 @@
+/* ============================================================================
+   MCLAB HOMEPAGE STYLES
+   ============================================================================
+   Uses the shared navy professional theme system with dark/light modes.
+   Organized for readability and maintainability.
+   =========================================================================== */
+
+/* ─────────────────────────────────────────────────────────────────────────
+   CSS VARIABLES - Navy Professional Theme System
+   ───────────────────────────────────────────────────────────────────────── */
+
+/* Dark Theme */
+html[data-theme="dark"] {
+	/* Primary Colors */
+	--bg-primary: #0a1128;
+	--bg-secondary: #1c2541;
+	--bg-tertiary: rgba(22, 27, 34, 0.9);
+	--bg-card: rgba(13, 17, 23, 0.7);
+
+	/* Text Colors */
+	--text-primary: #c9d1d9;
+	--text-heading: #e6edf3;
+	--text-secondary: #8b949e;
+	--text-accent: #79c0ff;
+
+	/* Border & Divider Colors */
+	--border-primary: #30363d;
+	--border-secondary: #21262d;
+
+	/* Action Colors */
+	--color-success: #238636;
+	--color-success-hover: #2ea043;
+	--color-danger: #da3633;
+
+	/* Background Gradients */
+	--gradient-bg: linear-gradient(135deg, #0a1128 0%, #1c2541 50%, #0a1128 100%);
+
+	/* Shadows */
+	--shadow-md: 0 4px 20px rgba(0, 0, 0, 0.5);
+	--shadow-lg: 0 4px 15px rgba(0, 0, 0, 0.4);
+	--shadow-hover: 0 6px 20px rgba(88, 166, 255, 0.2);
+
+	color-scheme: dark;
+}
+
+/* Light Theme */
+html[data-theme="light"] {
+	/* Primary Colors */
+	--bg-primary: #e6f0ff;
+	--bg-secondary: #f0f4ff;
+	--bg-tertiary: rgba(255, 255, 255, 0.95);
+	--bg-card: rgba(246, 248, 250, 0.9);
+
+	/* Text Colors */
+	--text-primary: #24292f;
+	--text-heading: #0a1128;
+	--text-secondary: #57606a;
+	--text-accent: #0969da;
+
+	/* Border & Divider Colors */
+	--border-primary: #d0d7de;
+	--border-secondary: #d0d7de;
+
+	/* Action Colors */
+	--color-success: #1a7f37;
+	--color-success-hover: #116329;
+	--color-danger: #cf222e;
+
+	/* Background Gradients */
+	--gradient-bg: linear-gradient(135deg, #e6f0ff 0%, #f0f4ff 50%, #e6f0ff 100%);
+
+	/* Shadows */
+	--shadow-md: 0 4px 20px rgba(0, 0, 0, 0.08);
+	--shadow-lg: 0 4px 15px rgba(0, 0, 0, 0.08);
+	--shadow-hover: 0 6px 20px rgba(9, 105, 218, 0.15);
+
+	color-scheme: light;
+}
+
+/* Default theme (fallback) - light theme */
+html {
+	/* Light theme as default */
+	--bg-primary: #e6f0ff;
+	--bg-secondary: #f0f4ff;
+	--bg-tertiary: rgba(255, 255, 255, 0.95);
+	--bg-card: rgba(246, 248, 250, 0.9);
+	--text-primary: #24292f;
+	--text-heading: #0a1128;
+	--text-secondary: #57606a;
+	--text-accent: #0969da;
+	--border-primary: #d0d7de;
+	--border-secondary: #d0d7de;
+	--color-success: #1a7f37;
+	--color-success-hover: #116329;
+	--color-danger: #cf222e;
+	--gradient-bg: linear-gradient(135deg, #e6f0ff 0%, #f0f4ff 50%, #e6f0ff 100%);
+	--shadow-md: 0 4px 20px rgba(0, 0, 0, 0.08);
+	--shadow-lg: 0 4px 15px rgba(0, 0, 0, 0.08);
+	--shadow-hover: 0 6px 20px rgba(9, 105, 218, 0.15);
+	color-scheme: light;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   GLOBAL STYLES
+   ───────────────────────────────────────────────────────────────────────── */
+
 * {
 	margin: 0;
 	padding: 0;
 	box-sizing: border-box;
 }
 
-:root {
-	--primary-color: #2c3e50;
-	--secondary-color: #3498db;
-	--accent-color: #e74c3c;
-	--light-bg: #ecf0f1;
-	--card-bg: #ffffff;
-	--text-dark: #2c3e50;
-	--text-light: #7f8c8d;
-	--shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-	--shadow-hover: 0 12px 24px rgba(0, 0, 0, 0.15);
+body {
+	font-family:
+		-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu,
+		Cantarell, sans-serif;
+	background: var(--gradient-bg);
+	background-repeat: no-repeat;
+	background-attachment: fixed;
+	min-height: 100vh;
+	color: var(--text-primary);
 }
 
-body {
-	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
-		Ubuntu, Cantarell, sans-serif;
-	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-	min-height: 100vh;
-	color: var(--text-dark);
-}
+/* ─────────────────────────────────────────────────────────────────────────
+   LAYOUT
+   ───────────────────────────────────────────────────────────────────────── */
 
 .container {
 	max-width: 1200px;
@@ -30,9 +131,13 @@ body {
 	padding: 2rem;
 }
 
+/* ─────────────────────────────────────────────────────────────────────────
+   HEADER
+   ───────────────────────────────────────────────────────────────────────── */
+
 header {
 	text-align: center;
-	color: white;
+	color: var(--text-heading);
 	margin-bottom: 3rem;
 }
 
@@ -40,14 +145,18 @@ header h1 {
 	font-size: 3rem;
 	font-weight: 700;
 	margin-bottom: 0.5rem;
-	text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+	letter-spacing: 1px;
 }
 
 header .subtitle {
 	font-size: 1.2rem;
-	opacity: 0.95;
+	color: var(--text-secondary);
 	font-weight: 300;
 }
+
+/* ─────────────────────────────────────────────────────────────────────────
+   APPS GRID
+   ───────────────────────────────────────────────────────────────────────── */
 
 .apps-grid {
 	display: grid;
@@ -56,15 +165,20 @@ header .subtitle {
 	padding: 1rem 0;
 }
 
+/* ─────────────────────────────────────────────────────────────────────────
+   APP CARD
+   ───────────────────────────────────────────────────────────────────────── */
+
 .app-card {
 	display: flex;
 	flex-direction: column;
-	background: var(--card-bg);
+	background: var(--bg-tertiary);
+	border: 1px solid var(--border-primary);
 	border-radius: 12px;
 	overflow: hidden;
 	cursor: pointer;
 	transition: all 0.3s ease;
-	box-shadow: var(--shadow);
+	box-shadow: var(--shadow-lg);
 	text-decoration: none;
 	color: inherit;
 }
@@ -72,16 +186,25 @@ header .subtitle {
 .app-card:hover {
 	transform: translateY(-8px);
 	box-shadow: var(--shadow-hover);
+	border-color: var(--text-accent);
 }
+
+/* ─────────────────────────────────────────────────────────────────────────
+   APP THUMBNAIL
+   ───────────────────────────────────────────────────────────────────────── */
 
 .app-thumbnail {
 	width: 100%;
 	height: 200px;
-	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	background: linear-gradient(135deg, #0a1128 0%, #1c2541 100%);
 	overflow: hidden;
 	display: flex;
 	align-items: center;
 	justify-content: center;
+}
+
+html[data-theme="light"] .app-thumbnail {
+	background: linear-gradient(135deg, #e6f0ff 0%, #d9ebff 100%);
 }
 
 .app-thumbnail img,
@@ -91,6 +214,10 @@ header .subtitle {
 	object-fit: contain;
 	display: block;
 }
+
+/* ─────────────────────────────────────────────────────────────────────────
+   APP INFO
+   ───────────────────────────────────────────────────────────────────────── */
 
 .app-info {
 	padding: 1.5rem;
@@ -103,34 +230,75 @@ header .subtitle {
 	font-size: 1.5rem;
 	font-weight: 600;
 	margin-bottom: 0.5rem;
-	color: var(--text-dark);
+	color: var(--text-heading);
 }
 
 .app-description {
 	font-size: 0.95rem;
-	color: var(--text-light);
+	color: var(--text-secondary);
 	margin-bottom: 1rem;
 	flex-grow: 1;
+	line-height: 1.5;
 }
+
+/* ─────────────────────────────────────────────────────────────────────────
+   APP LINK BUTTON
+   ───────────────────────────────────────────────────────────────────────── */
 
 .app-link {
 	display: inline-block;
 	margin-top: auto;
 	padding: 0.75rem 1.5rem;
-	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	background: var(--color-success);
 	color: white;
 	text-decoration: none;
 	border-radius: 6px;
-	font-weight: 500;
-	transition: transform 0.2s ease;
+	font-weight: 600;
+	transition: all 0.2s ease;
 	border: none;
 	cursor: pointer;
 	text-align: center;
 }
 
 .app-link:hover {
+	background: var(--color-success-hover);
 	transform: scale(1.05);
 }
+
+.app-link:active {
+	transform: scale(0.98);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   THEME TOGGLE BUTTON
+   ───────────────────────────────────────────────────────────────────────── */
+
+.theme-toggle {
+	position: fixed;
+	top: 1rem;
+	right: 1rem;
+	background: rgba(128, 128, 128, 0.3);
+	border: 1px solid rgba(128, 128, 128, 0.5);
+	border-radius: 50%;
+	width: 3rem;
+	height: 3rem;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 1.5rem;
+	transition: all 0.3s;
+	z-index: 1000;
+}
+
+.theme-toggle:hover {
+	background: rgba(128, 128, 128, 0.5);
+	transform: scale(1.1);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   RESPONSIVE DESIGN
+   ───────────────────────────────────────────────────────────────────────── */
 
 @media (max-width: 768px) {
 	header h1 {

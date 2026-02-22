@@ -8,6 +8,7 @@
 	"license": "MIT",
 	"type": "module",
 	"scripts": {
+		"build": "make build",
 		"dev": "make build && cd build && npx http-server -p 8080 -c-1",
 		"homepage:dev": "cd homepage && npx http-server -p 8080 -c-1",
 		"telegram:dev": "cd telegram-bot && node --env-file=.env index.js",

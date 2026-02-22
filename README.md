@@ -125,11 +125,114 @@ If you add a new app, you’ll likely want to:
 - For CRA apps under subpaths, keep the `homepage` field aligned with the deployed path so asset URLs are correct.
 - Redirect rules are not currently committed; if needed, add `netlify.toml` at repo root or `_redirects` in `homepage/` (copied into `build/`).
 
+## CSS and Theme System
+
+All projects use a **shared navy professional dark/light theme system** for consistency.
+
+### Architecture
+
+Apps are styled using modular CSS files:
+
+1. **theme-variables.css** - CSS custom properties for dark/light themes (colors, gradients, shadows)
+2. **shared-styles.css** - Reusable base styles (typography, layout, forms, buttons)
+3. **app-specific.css** - App-specific components
+4. **Main CSS file** - Imports the three modules above
+
+See `CSS_SYSTEM.md` for detailed documentation.
+
+### Using the theme system in a new app
+
+1. Copy the theme variable definitions from an existing app (e.g., `game-draft/src/theme-variables.css`)
+2. Create/organize your CSS using the modular approach above
+3. Add the theme toggle button and script logic (see `homepage/script.js` for reference)
+4. Always use CSS variables (e.g., `var(--bg-card)`, `var(--text-primary)`) instead of hard-coded colors
+
+### Key implementation details
+
+- **CSS selectors**: Use `html[data-theme="dark"]` and `html[data-theme="light"]`, NOT `body[data-theme]` (avoids cascade issues)
+- **Theme toggle icon**: Show the _opposite_ icon to indicate what clicking will do (☀️ in dark mode, 🌙 in light mode)
+- **Theme detection hierarchy**:
+  1. Saved preference (localStorage)
+  2. System preference (`prefers-color-scheme` media query)
+  3. Default (light theme)
+- **Meta tags**: Add `<meta name="color-scheme" content="light dark" />` for browser/extension compatibility
+
+### Color palette (Navy Professional)
+
+**Dark Theme:**
+
+- Background: `#0a1128` → `#1c2541`
+- Text: `#c9d1d9` (primary) → `#e6edf3` (headings)
+- Accent: `#79c0ff` (blue), `#238636` (success)
+
+**Light Theme:**
+
+- Background: `#e6f0ff` → `#f0f4ff`
+- Text: `#24292f` (primary) → `#0a1128` (headings)
+- Accent: `#0969da` (blue), `#1a7f37` (success)
+
 ## Environment/config expectations
 
 - No secrets are committed to the repo. Runtime secrets live in Netlify env vars (functions) or on the Pi for the Telegram bot.
 - `functions/bin` expects `API_TOKEN` (Pushbullet) configured in Netlify env vars.
 - `telegram-bot` runs on a home Raspberry Pi and expects `TELEGRAM_BOT_TOKEN` and `NOTION_TOKEN` in a local `.env` on that machine.
+
+## Netlify Serverless Functions
+
+Apps can use Netlify Functions (in `functions/`) to solve server-side problems like CORS proxying.
+
+### Pattern: CORS proxy
+
+If a front-end app needs to fetch from an external API that doesn't allow cross-origin requests:
+
+1. Create a function in `functions/<app-name>/` that accepts the request parameters
+2. Have the function fetch the external API server-side (no CORS issues)
+3. Return the data to the client
+4. Call the function from the client via `/.netlify/functions/<app-name>`
+
+Example: `game-draft` uses `metacritic-proxy` to fetch game scores from Metacritic without CORS errors.
+
+## Data persistence patterns
+
+Apps use different persistence strategies depending on use case:
+
+- **localStorage**: User's personal data that should persist across sessions (e.g., draft scores, preferences)
+- **URL query params**: Data to be shared with others (can be encoded/decoded for complex objects)
+- **Combination**: Save to localStorage for primary persistence, allow sharing via URL params with a prompt to merge or overwrite
+
+Example: `game-draft` lets users save scores locally, but also generate shareable links that encode the entire draft state in the URL.
+
+### Encoding complex data in URLs
+
+For complex objects, use base64 URL-safe encoding:
+
+```javascript
+// Encode
+const encoded = btoa(JSON.stringify(data))
+	.replace(/\+/g, "-")
+	.replace(/\//g, "_")
+	.replace(/=/g, "");
+
+// Decode
+const decoded = JSON.parse(atob(encoded.replace(/-/g, "+").replace(/_/g, "/")));
+```
+
+## App-specific notes: Game Draft
+
+`game-draft/` is a fantasy draft scoring tool with these features:
+
+- **Metacritic integration**: Fetches game scores via the `metacritic-proxy` Netlify function
+- **Shareable drafts**: Encodes the entire draft state in the URL (base64 encoded JSON)
+- **View-only mode**: Shared links can be view-only (read-only state, no localStorage writes) or overwrite mode (asks user to confirm before replacing their data)
+- **Dark/light theme**: Full dark mode support with system preference detection and manual toggle
+- **Error handling**: Graceful fallback if Metacritic fetches fail; user can enter scores manually
+
+Key files:
+
+- `src/App.js`: Main component with state management
+- `src/metacritic.js`: API integration
+- `src/theme-variables.css`, `shared-styles.css`, `app-specific.css`: Modular CSS
+- `public/index.html`: Includes color-scheme meta tag
 
 ## Adding a new app (quick checklist)
 

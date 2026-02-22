@@ -1,3 +1,59 @@
+// ============================================================================
+// THEME MANAGEMENT
+// ============================================================================
+
+function initializeTheme() {
+	// Check if user has a saved theme preference
+	const savedTheme = localStorage.getItem("theme");
+
+	// Check if system prefers dark mode
+	const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+
+	// Determine the initial theme
+	const initialTheme = savedTheme || (prefersDark ? "dark" : "light");
+
+	// Apply the theme
+	applyTheme(initialTheme);
+
+	// Set up the theme toggle button
+	const themeToggle = document.getElementById("themeToggle");
+	if (themeToggle) {
+		themeToggle.addEventListener("click", toggleTheme);
+	}
+
+	// Listen for system theme changes
+	window
+		.matchMedia("(prefers-color-scheme: dark)")
+		.addEventListener("change", (e) => {
+			if (!localStorage.getItem("theme")) {
+				applyTheme(e.matches ? "dark" : "light");
+			}
+		});
+}
+
+function applyTheme(theme) {
+	document.documentElement.setAttribute("data-theme", theme);
+	localStorage.setItem("theme", theme);
+
+	// Update the toggle button emoji
+	// Show opposite icon: in dark mode, show sun (to switch to light); in light mode, show moon (to switch to dark)
+	const themeToggle = document.getElementById("themeToggle");
+	if (themeToggle) {
+		themeToggle.textContent = theme === "dark" ? "☀️" : "🌙";
+	}
+}
+
+function toggleTheme() {
+	const currentTheme =
+		document.documentElement.getAttribute("data-theme") || "light";
+	const newTheme = currentTheme === "light" ? "dark" : "light";
+	applyTheme(newTheme);
+}
+
+// ============================================================================
+// APP CONFIGURATION & RENDERING
+// ============================================================================
+
 // App configuration - add new apps here
 const apps = [
 	{
@@ -35,6 +91,7 @@ const appsGrid = document.getElementById("appsGrid");
 
 // Initialize the homepage
 function initializeHomepage() {
+	initializeTheme();
 	renderApps();
 }
 
@@ -46,13 +103,13 @@ function renderApps() {
 // Create a single app card
 function createAppCard(app) {
 	const thumbnailHtml = app.thumbnailFallback
-		? `<div class="app-thumbnail" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center;">
+		? `<div class="app-thumbnail" style="display: flex; align-items: center; justify-content: center;">
              <span style="color: white; font-size: 2rem; font-weight: bold;">${app.title.charAt(
 								0,
 							)}</span>
            </div>`
 		: `<div class="app-thumbnail">
-             <img src="${app.thumbnail}" alt="${app.title}" onerror="this.parentElement.style.backgroundImage='linear-gradient(135deg, #667eea 0%, #764ba2 100%)'; this.style.display='none';">
+             <img src="${app.thumbnail}" alt="${app.title}" onerror="this.parentElement.style.display='flex'; this.style.display='none';">
            </div>`;
 
 	return `
