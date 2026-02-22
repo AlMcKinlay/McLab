@@ -11,7 +11,10 @@ function App() {
 		<div className="App">
 			<header className="App-header">Pokemon List Maker</header>
 			<main>
-				<SelectionList selectPokemon={selectPokemon}></SelectionList>
+				<SelectionList
+					selectPokemon={selectPokemon}
+					selected={selected}
+				></SelectionList>
 				<div className="list">
 					<OutputSettings clear={clear}></OutputSettings>
 					<OutputList

@@ -80,6 +80,38 @@ main {
 	transform: translateY(-2px);
 }
 
+.pokemon-list > div.selected {
+	background-color: var(--action-primary);
+	border-color: var(--action-primary);
+	box-shadow: var(--shadow-lg);
+}
+
+.pokemon-list > div.selected:hover {
+	box-shadow: var(--shadow-lg);
+	transform: translateY(-2px);
+}
+
+.pokemon-card {
+	position: relative;
+}
+
+.pokemon-card-check {
+	position: absolute;
+	top: 0.25rem;
+	right: 0.25rem;
+	background-color: var(--action-primary);
+	color: #fff;
+	border-radius: 50%;
+	width: 1.5rem;
+	height: 1.5rem;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-weight: bold;
+	font-size: 0.9rem;
+	box-shadow: 0 2px 4px rgb(0 0 0 / 20%);
+}
+
 /* Responsive Design */
 @media (width <= 1024px) {
 	main {
