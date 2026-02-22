@@ -1,33 +1,136 @@
-.App {
-	text-align: center;
+/* Theme Toggle Button */
+.theme-toggle {
+	position: fixed;
+	top: 1rem;
+	right: 1rem;
+	background: rgb(128 128 128 / 30%);
+	border: 1px solid rgb(128 128 128 / 50%);
+	border-radius: 50%;
+	width: 3rem;
+	height: 3rem;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 1.5rem;
+	transition: all 0.3s;
+	z-index: 1000;
 }
 
-.App-logo {
-	animation: App-logo-spin infinite 20s linear;
-	height: 40vmin;
-	pointer-events: none;
+.theme-toggle:hover {
+	background: rgb(128 128 128 / 50%);
+	transform: scale(1.1);
+}
+
+/* App Container */
+html,
+body {
+	background: var(--gradient-bg);
+	color: var(--text-primary);
+	color-scheme: light dark;
+}
+
+.App {
+	text-align: center;
+	min-height: 100vh;
+	display: flex;
+	flex-direction: column;
 }
 
 .App-header {
-	background-color: #282c34;
-	min-height: 100vh;
-	display: flex;
-	flex-direction: row;
+	background: transparent;
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 2rem;
+	padding: 2rem;
+	flex: 1;
 	align-items: center;
 	justify-content: center;
-	color: #fff;
+	color: var(--text-primary);
 }
 
-.App-link {
-	color: #61dafb;
+/* Bingo Card Section */
+.bingo-section {
+	border-radius: 8px;
+	background: var(--bg-tertiary);
+	padding: 1.5rem;
+	border: 1px solid var(--border-primary);
+	box-shadow: var(--shadow-md);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 500px;
+	width: 100%;
+	overflow: auto;
 }
 
-@keyframes App-logo-spin {
-	from {
-		transform: rotate(0deg);
+/* Input Section */
+.input-section {
+	border-radius: 8px;
+	background: var(--bg-tertiary);
+	padding: 2rem;
+	border: 1px solid var(--border-primary);
+	box-shadow: var(--shadow-md);
+	display: flex;
+	flex-direction: column;
+	gap: 1.5rem;
+	justify-content: center;
+}
+
+.input-section textarea {
+	flex: 1;
+	min-height: 250px;
+}
+
+.button-container {
+	display: flex;
+	gap: 1rem;
+	justify-content: center;
+}
+
+.button-container .btn {
+	padding: 0.75rem 2rem;
+	font-size: 1.1rem;
+}
+
+/* Responsive Design */
+@media (width <= 1024px) {
+	.App-header {
+		grid-template-columns: 1fr;
+		gap: 1.5rem;
+		padding: 1.5rem;
 	}
 
-	to {
-		transform: rotate(360deg);
+	.bingo-section {
+		min-height: 400px;
+	}
+}
+
+@media (width <= 768px) {
+	.App-header {
+		gap: 1rem;
+		padding: 1rem;
+	}
+
+	.bingo-section {
+		min-height: 350px;
+		padding: 1rem;
+	}
+
+	.input-section {
+		padding: 1rem;
+		gap: 1rem;
+	}
+
+	.input-section textarea {
+		min-height: 200px;
+	}
+
+	.button-container {
+		flex-direction: column;
+	}
+
+	.button-container .btn {
+		width: 100%;
 	}
 }

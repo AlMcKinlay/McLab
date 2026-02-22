@@ -8,6 +8,7 @@ function Filter({ filter, setFilter, selectTop }) {
 	return (
 		<>
 			<input
+				className="game-input"
 				placeholder="Name..."
 				value={filter.name}
 				onKeyDown={_handleKeyDown}

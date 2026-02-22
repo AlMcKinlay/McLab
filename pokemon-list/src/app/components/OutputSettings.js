@@ -1,7 +1,9 @@
 function OutputSettings({ clear }) {
 	return (
 		<>
-			<button onClick={clear}>Clear</button>
+			<button className="btn btn-primary" onClick={clear}>
+				Clear
+			</button>
 		</>
 	);
 }

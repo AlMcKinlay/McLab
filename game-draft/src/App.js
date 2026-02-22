@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { fetchMetacriticScore } from "./metacritic";
 import { encodeToURL, decodeFromURL } from "shared-utils";
 import "shared-utils/theme-variables.css";
+import "shared-utils/shared-styles.css";
 import "./App.css";
 
 function App() {

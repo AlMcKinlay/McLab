@@ -1,48 +1,27 @@
 import React, { useState, useEffect } from "react";
+import "shared-utils/theme-variables.css";
+import "shared-utils/shared-styles.css";
 import "./App.css";
 import Bingo from "./bingo";
 import styled from "styled-components";
-
-const Header = styled.header`
-	display: grid;
-	width: 100%;
-	height: 100%;
-	align-items: stretch;
-	justify-content: stretch;
-	grid-auto-rows: 1fr 1fr;
-	@media (min-aspect-ratio: 1/1) {
-		grid-auto-flow: column;
-		grid-auto-columns: 1fr 1fr;
-	}
-`;
+import { initializeTheme } from "shared-utils";
 
 const BingoWrapper = styled.div`
-	display: grid;
-
-	@media (min-aspect-ratio: 1/1) {
-		margin: auto 0;
-		height: 50vw;
-	}
+	width: 100%;
+	max-width: 500px;
+	aspect-ratio: 1;
 `;
 
 const ArgsWrapper = styled.div`
-	@media (min-aspect-ratio: 1/1) {
-		margin: auto 0;
-		height: 50vw;
-	}
-	display: grid;
-	grid-auto-rows: 7fr 1fr;
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	gap: 1.5rem;
 `;
 
-const GenerateButton = styled.button`
-	width: 200px;
-	margin: auto;
-	height: 50px;
-`;
+const GenerateButton = styled.button``;
 
-const Args = styled.textarea`
-	margin: 40px;
-`;
+const Args = styled.textarea``;
 
 const randomiseArgs = (argsToRandomise) => {
 	return argsToRandomise
@@ -53,7 +32,7 @@ const randomiseArgs = (argsToRandomise) => {
 
 const usePersistedState = (localStorageKey) => {
 	const [value, setValue] = useState(
-		localStorage.getItem(localStorageKey) || ""
+		localStorage.getItem(localStorageKey) || "",
 	);
 
 	useEffect(() => {
@@ -63,38 +42,82 @@ const usePersistedState = (localStorageKey) => {
 	return [value, setValue];
 };
 
+const usePersistedObjectState = (localStorageKey, initialValue) => {
+	const [value, setValue] = useState(() => {
+		const saved = localStorage.getItem(localStorageKey);
+		return saved ? JSON.parse(saved) : initialValue;
+	});
+
+	useEffect(() => {
+		localStorage.setItem(localStorageKey, JSON.stringify(value));
+	}, [value, localStorageKey]);
+
+	return [value, setValue];
+};
+
 function App() {
+	useEffect(() => {
+		initializeTheme();
+	}, []);
+
 	const [args, setArgs] = usePersistedState("bingo.args");
-	const [bingoEntries, setBingoEntries] = useState([]);
-	const [completed, setCompleted] = useState({});
+	const [bingoEntries, setBingoEntries] = useState(() => {
+		const saved = localStorage.getItem("bingo.entries");
+		return saved ? JSON.parse(saved) : [];
+	});
+	const [completed, setCompleted] = usePersistedObjectState(
+		"bingo.completed",
+		{},
+	);
+
+	// Save bingoEntries to localStorage whenever they change
+	useEffect(() => {
+		localStorage.setItem("bingo.entries", JSON.stringify(bingoEntries));
+	}, [bingoEntries]);
+
+	const clearChecked = () => {
+		setCompleted({});
+	};
 
 	return (
 		<div className="App">
-			<Header className="App-header">
-				<BingoWrapper>
-					<Bingo
-						args={bingoEntries}
-						completed={completed}
-						complete={(index) => setCompleted({ ...completed, [index]: true })}
-						needMore={args.split("\n").filter((arg) => arg !== "").length < 24}
-					></Bingo>
-				</BingoWrapper>
-				<ArgsWrapper>
+			<div className="App-header">
+				<div className="bingo-section">
+					<BingoWrapper>
+						<Bingo
+							args={bingoEntries}
+							completed={completed}
+							complete={(index) =>
+								setCompleted({ ...completed, [index]: true })
+							}
+							clearChecked={clearChecked}
+							needMore={
+								args.split("\n").filter((arg) => arg !== "").length < 24
+							}
+						></Bingo>
+					</BingoWrapper>
+				</div>
+				<div className="input-section">
+					<h2 style={{ margin: 0 }}>Add Bingo Items</h2>
 					<Args
+						className="game-input"
 						value={args}
 						onChange={(event) => setArgs(event.target.value)}
 						placeholder="Enter newline separated values"
 					></Args>
-					<GenerateButton
-						onClick={() => {
-							setBingoEntries(randomiseArgs(args));
-							setCompleted({});
-						}}
-					>
-						Generate
-					</GenerateButton>
-				</ArgsWrapper>
-			</Header>
+					<div className="button-container">
+						<GenerateButton
+							className="btn btn-primary"
+							onClick={() => {
+								setBingoEntries(randomiseArgs(args));
+								setCompleted({});
+							}}
+						>
+							Generate
+						</GenerateButton>
+					</div>
+				</div>
+			</div>
 		</div>
 	);
 }

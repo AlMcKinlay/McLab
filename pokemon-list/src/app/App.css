@@ -1,5 +1,10 @@
 .App {
 	text-align: center;
+	background: var(--gradient-bg);
+	color: var(--text-primary);
+	min-height: 100vh;
+	display: flex;
+	flex-direction: column;
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -9,39 +14,104 @@
 }
 
 .App-header {
-	background-color: #282c34;
-	height: 5vh;
-	min-height: 50px;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-	font-size: calc(10px + 2vmin);
-	color: #fff;
+	background: transparent;
+	padding: 2rem 1rem;
+	border-bottom: 1px solid var(--border-primary);
+	font-size: 2.5rem;
+	font-weight: 600;
+	color: var(--text-heading);
+	letter-spacing: 1px;
 }
 
 .App-link {
-	color: #61dafb;
+	color: var(--text-accent);
 }
 
 main {
 	display: grid;
 	grid-template-columns: 1fr 1fr;
-	height: calc(95vh - 10px);
-	padding-top: 10px;
+	gap: 2rem;
+	flex: 1;
+	padding: 2rem;
+	overflow: hidden;
 }
 
 .list {
+	display: flex;
+	flex-direction: column;
+	gap: 1.5rem;
 	overflow: auto;
+	border-radius: 8px;
+	background: var(--bg-tertiary);
+	padding: 1.5rem;
+	border: 1px solid var(--border-primary);
+	box-shadow: var(--shadow-md);
 }
 
-ul {
+.list:first-of-type {
+	gap: 1rem;
+}
+
+.list:first-of-type .pokemon-list {
+	margin: 0;
+}
+
+.pokemon-list {
 	list-style-type: none;
 	display: grid;
-	grid-template-columns: repeat(5, 1fr);
+	grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+	gap: 0.75rem;
+	margin: 0;
+	padding: 0;
 }
 
-ul div:hover {
-	background-color: #282c34;
-	color: #fff;
+.pokemon-list > div {
+	border-radius: 6px;
+	overflow: hidden;
+	cursor: pointer;
+	transition: all 0.2s;
+	border: 1px solid var(--border-secondary);
+}
+
+.pokemon-list > div:hover {
+	background-color: var(--bg-card);
+	border-color: var(--color-info);
+	box-shadow: var(--shadow-lg);
+	transform: translateY(-2px);
+}
+
+/* Responsive Design */
+@media (width <= 1024px) {
+	main {
+		grid-template-columns: 1fr;
+		gap: 1.5rem;
+		padding: 1.5rem;
+	}
+
+	.App-header {
+		font-size: 2rem;
+		padding: 1.5rem 1rem;
+	}
+}
+
+@media (width <= 768px) {
+	.App-header {
+		font-size: 1.75rem;
+		padding: 1rem;
+	}
+
+	main {
+		padding: 1rem;
+		gap: 1rem;
+	}
+
+	.list {
+		padding: 1rem;
+		gap: 1rem;
+	}
+
+	.pokemon-list {
+		grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+		gap: 0.5rem;
+	}
 }
