@@ -16,10 +16,18 @@ function App() {
 	const [showSharePrompt, setShowSharePrompt] = useState(false);
 	const [viewOnly, setViewOnly] = useState(false);
 	const [theme, setTheme] = useState(() => {
-		// Check localStorage first
-		const savedTheme = localStorage.getItem("gameDraftTheme");
+		// Check localStorage first (shared key across all apps)
+		const savedTheme = localStorage.getItem("theme");
 		if (savedTheme) {
 			return savedTheme;
+		}
+		// Backwards compatibility: check old app-specific key
+		const oldSavedTheme = localStorage.getItem("gameDraftTheme");
+		if (oldSavedTheme) {
+			// Migrate to new shared key
+			localStorage.setItem("theme", oldSavedTheme);
+			localStorage.removeItem("gameDraftTheme");
+			return oldSavedTheme;
 		}
 		// Otherwise detect system preference
 		if (
@@ -92,7 +100,7 @@ function App() {
 	// Apply theme via data attribute on html (matches shared theme-variables.css)
 	useEffect(() => {
 		document.documentElement.setAttribute("data-theme", theme);
-		localStorage.setItem("gameDraftTheme", theme);
+		localStorage.setItem("theme", theme);
 	}, [theme]);
 
 	// Toggle between light and dark theme
