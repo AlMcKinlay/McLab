@@ -10,9 +10,9 @@ html[data-theme="dark"] {
 	/* Primary Colors */
 	--bg-primary: #0a1128;
 	--bg-secondary: #1c2541;
-	--bg-tertiary: rgba(22, 27, 34, 0.9);
-	--bg-card: rgba(13, 17, 23, 0.7);
-	--bg-input: rgba(13, 17, 23, 0.9);
+	--bg-tertiary: rgba(22 27 34 / 90%);
+	--bg-card: rgba(13 17 23 / 70%);
+	--bg-input: rgba(13 17 23 / 90%);
 
 	/* Text Colors */
 	--text-primary: #c9d1d9;
@@ -35,18 +35,18 @@ html[data-theme="dark"] {
 	--gradient-bg: linear-gradient(135deg, #0a1128 0%, #1c2541 50%, #0a1128 100%);
 	--gradient-card: linear-gradient(
 		135deg,
-		rgba(22, 27, 34, 0.8) 0%,
-		rgba(13, 17, 23, 0.8) 100%
+		rgba(22 27 34 / 80%) 0%,
+		rgba(13 17 23 / 80%) 100%
 	);
 
 	/* Shadow Values */
-	--shadow-sm: 0 4px 12px rgba(46, 160, 67, 0.3);
-	--shadow-md: 0 4px 20px rgba(0, 0, 0, 0.5);
-	--shadow-lg: 0 4px 15px rgba(0, 0, 0, 0.4);
-	--shadow-hover: 0 6px 20px rgba(88, 166, 255, 0.2);
+	--shadow-sm: 0 4px 12px rgba(46 160 67 / 30%);
+	--shadow-md: 0 4px 20px rgba(0 0 0 / 50%);
+	--shadow-lg: 0 4px 15px rgba(0 0 0 / 40%);
+	--shadow-hover: 0 6px 20px rgba(88 166 255 / 20%);
 
 	/* Focus States */
-	--focus-ring: 0 0 0 2px rgba(88, 166, 255, 0.2);
+	--focus-ring: 0 0 0 2px rgba(88 166 255 / 20%);
 
 	color-scheme: dark;
 }
@@ -56,9 +56,9 @@ html[data-theme="light"] {
 	/* Primary Colors */
 	--bg-primary: #e6f0ff;
 	--bg-secondary: #f0f4ff;
-	--bg-tertiary: rgba(255, 255, 255, 0.95);
-	--bg-card: rgba(246, 248, 250, 0.9);
-	--bg-input: white;
+	--bg-tertiary: rgba(255 255 255 / 95%);
+	--bg-card: rgba(246 248 250 / 90%);
+	--bg-input: #fff;
 
 	/* Text Colors */
 	--text-primary: #24292f;
@@ -81,18 +81,18 @@ html[data-theme="light"] {
 	--gradient-bg: linear-gradient(135deg, #e6f0ff 0%, #f0f4ff 50%, #e6f0ff 100%);
 	--gradient-card: linear-gradient(
 		135deg,
-		rgba(255, 255, 255, 0.95) 0%,
-		rgba(246, 248, 250, 0.95) 100%
+		rgba(255 255 255 / 95%) 0%,
+		rgba(246 248 250 / 95%) 100%
 	);
 
 	/* Shadow Values */
-	--shadow-sm: 0 4px 12px rgba(26, 127, 55, 0.3);
-	--shadow-md: 0 4px 20px rgba(0, 0, 0, 0.08);
-	--shadow-lg: 0 4px 15px rgba(0, 0, 0, 0.08);
-	--shadow-hover: 0 6px 20px rgba(9, 105, 218, 0.15);
+	--shadow-sm: 0 4px 12px rgba(26 127 55 / 30%);
+	--shadow-md: 0 4px 20px rgba(0 0 0 / 8%);
+	--shadow-lg: 0 4px 15px rgba(0 0 0 / 8%);
+	--shadow-hover: 0 6px 20px rgba(9 105 218 / 15%);
 
 	/* Focus States */
-	--focus-ring: 0 0 0 2px rgba(9, 105, 218, 0.15);
+	--focus-ring: 0 0 0 2px rgba(9 105 218 / 15%);
 
 	color-scheme: light;
 }
@@ -102,9 +102,9 @@ html {
 	/* Light theme as default */
 	--bg-primary: #e6f0ff;
 	--bg-secondary: #f0f4ff;
-	--bg-tertiary: rgba(255, 255, 255, 0.95);
-	--bg-card: rgba(246, 248, 250, 0.9);
-	--bg-input: white;
+	--bg-tertiary: rgba(255 255 255 / 95%);
+	--bg-card: rgba(246 248 250 / 90%);
+	--bg-input: #fff;
 	--text-primary: #24292f;
 	--text-heading: #0a1128;
 	--text-secondary: #57606a;
@@ -119,13 +119,15 @@ html {
 	--gradient-bg: linear-gradient(135deg, #e6f0ff 0%, #f0f4ff 50%, #e6f0ff 100%);
 	--gradient-card: linear-gradient(
 		135deg,
-		rgba(255, 255, 255, 0.95) 0%,
-		rgba(246, 248, 250, 0.95) 100%
+		rgba(255 255 255 / 95%) 0%,
+		rgba(246 248 250 / 95%) 100%
 	);
-	--shadow-sm: 0 4px 12px rgba(26, 127, 55, 0.3);
-	--shadow-md: 0 4px 20px rgba(0, 0, 0, 0.08);
-	--shadow-lg: 0 4px 15px rgba(0, 0, 0, 0.08);
-	--shadow-hover: 0 6px 20px rgba(9, 105, 218, 0.15);
-	--focus-ring: 0 0 0 2px rgba(9, 105, 218, 0.15);
+	--shadow-sm: 0 4px 12px rgba(26 127 55 / 30%);
+	--shadow-md: 0 4px 20px rgba(0 0 0 / 8%);
+	--shadow-lg: 0 4px 15px rgba(0 0 0 / 8%);
+	--shadow-hover: 0 6px 20px rgba(9 105 218 / 15%);
+	--focus-ring: 0 0 0 2px rgba(9 105 218 / 15%);
+
 	color-scheme: light;
 }
+

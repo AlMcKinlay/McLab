@@ -57,6 +57,20 @@ function toggleTheme() {
 // App configuration - add new apps here
 const apps = [
 	{
+		id: "game-draft",
+		title: "Game Draft",
+		description: "Track Metacritic scores for your fantasy game draft",
+		url: "/game-draft",
+		thumbnail: "./game-draft-thumbnail.png",
+	},
+	{
+		id: "switch",
+		title: "Switch",
+		description: "Nintendo Switch game sale tracker",
+		url: "/switch",
+		thumbnail: "./switch-thumbnail.png",
+	},
+	{
 		id: "pokemon-list",
 		title: "Pokemon List",
 		description: "Browse and search Pokemon",
@@ -64,25 +78,11 @@ const apps = [
 		thumbnail: "./pokemon-thumbnail.png",
 	},
 	{
-		id: "switch",
-		title: "Switch",
-		description: "Nintendo Switch game tracker",
-		url: "/switch",
-		thumbnail: "./switch-thumbnail.png",
-	},
-	{
 		id: "bingo",
 		title: "Bingo",
-		description: "Interactive bingo game",
+		description: "Create randomly generated bingo card from input",
 		url: "/bingo",
 		thumbnail: "./bingo-thumbnail.png",
-	},
-	{
-		id: "game-draft",
-		title: "Game Draft",
-		description: "Track Metacritic scores for your fantasy game draft",
-		url: "/game-draft",
-		thumbnail: "./game-draft-thumbnail.png",
 	},
 ];
 

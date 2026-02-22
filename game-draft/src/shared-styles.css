@@ -110,7 +110,7 @@ h2 {
 	transition: all 0.2s;
 	flex-shrink: 0;
 	background: var(--color-danger);
-	color: white;
+	color: #fff;
 	font-weight: 600;
 }
 
@@ -167,7 +167,7 @@ h2 {
 
 .btn-primary {
 	background: var(--color-success);
-	color: white;
+	color: #fff;
 }
 
 .btn-primary:hover:not(:disabled) {
@@ -202,9 +202,9 @@ h2 {
 	padding: 1rem;
 	border-radius: 4px;
 	margin-top: 1rem;
-	background: rgba(207, 34, 46, 0.1);
+	background: rgb(207 34 46 / 10%);
 	color: var(--color-danger);
-	border: 1px solid rgba(207, 34, 46, 0.3);
+	border: 1px solid rgb(207 34 46 / 30%);
 }
 
 .share-message {
@@ -217,9 +217,9 @@ h2 {
 	justify-content: space-between;
 	gap: 1rem;
 	flex-wrap: wrap;
-	background: rgba(9, 105, 218, 0.1);
+	background: rgb(9 105 218 / 10%);
 	color: var(--text-accent);
-	border: 1px solid rgba(9, 105, 218, 0.25);
+	border: 1px solid rgb(9 105 218 / 25%);
 }
 
 .share-prompt {
@@ -229,9 +229,9 @@ h2 {
 	display: flex;
 	flex-direction: column;
 	gap: 1rem;
-	background: rgba(9, 105, 218, 0.08);
+	background: rgb(9 105 218 / 8%);
 	color: var(--text-primary);
-	border: 1px solid rgba(9, 105, 218, 0.2);
+	border: 1px solid rgb(9 105 218 / 20%);
 }
 
 .share-prompt-actions {
@@ -244,7 +244,7 @@ h2 {
    RESPONSIVE DESIGN
    ───────────────────────────────────────────────────────────────────────── */
 
-@media (max-width: 768px) {
+@media (width <= 768px) {
 	.app-container {
 		padding: 1rem;
 	}
