@@ -1,0 +1,131 @@
+/* ============================================================================
+   SHARED THEME VARIABLES - Navy Professional Color System
+   ============================================================================
+   This file defines CSS custom properties for both dark and light themes.
+   Import this in your main CSS file, then all apps will use consistent colors.
+   =========================================================================== */
+
+/* Dark Theme - Navy Professional */
+html[data-theme="dark"] {
+	/* Primary Colors */
+	--bg-primary: #0a1128;
+	--bg-secondary: #1c2541;
+	--bg-tertiary: rgba(22, 27, 34, 0.9);
+	--bg-card: rgba(13, 17, 23, 0.7);
+	--bg-input: rgba(13, 17, 23, 0.9);
+
+	/* Text Colors */
+	--text-primary: #c9d1d9;
+	--text-heading: #e6edf3;
+	--text-secondary: #8b949e;
+	--text-accent: #79c0ff;
+
+	/* Border & Divider Colors */
+	--border-primary: #30363d;
+	--border-secondary: #21262d;
+
+	/* Action Colors */
+	--color-success: #238636;
+	--color-success-hover: #2ea043;
+	--color-danger: #da3633;
+	--color-danger-hover: #f85149;
+	--color-info: #58a6ff;
+
+	/* Background Gradients */
+	--gradient-bg: linear-gradient(135deg, #0a1128 0%, #1c2541 50%, #0a1128 100%);
+	--gradient-card: linear-gradient(
+		135deg,
+		rgba(22, 27, 34, 0.8) 0%,
+		rgba(13, 17, 23, 0.8) 100%
+	);
+
+	/* Shadow Values */
+	--shadow-sm: 0 4px 12px rgba(46, 160, 67, 0.3);
+	--shadow-md: 0 4px 20px rgba(0, 0, 0, 0.5);
+	--shadow-lg: 0 4px 15px rgba(0, 0, 0, 0.4);
+	--shadow-hover: 0 6px 20px rgba(88, 166, 255, 0.2);
+
+	/* Focus States */
+	--focus-ring: 0 0 0 2px rgba(88, 166, 255, 0.2);
+
+	color-scheme: dark;
+}
+
+/* Light Theme - Navy Professional */
+html[data-theme="light"] {
+	/* Primary Colors */
+	--bg-primary: #e6f0ff;
+	--bg-secondary: #f0f4ff;
+	--bg-tertiary: rgba(255, 255, 255, 0.95);
+	--bg-card: rgba(246, 248, 250, 0.9);
+	--bg-input: white;
+
+	/* Text Colors */
+	--text-primary: #24292f;
+	--text-heading: #0a1128;
+	--text-secondary: #57606a;
+	--text-accent: #0969da;
+
+	/* Border & Divider Colors */
+	--border-primary: #d0d7de;
+	--border-secondary: #d0d7de;
+
+	/* Action Colors */
+	--color-success: #1a7f37;
+	--color-success-hover: #116329;
+	--color-danger: #cf222e;
+	--color-danger-hover: #a40e26;
+	--color-info: #0969da;
+
+	/* Background Gradients */
+	--gradient-bg: linear-gradient(135deg, #e6f0ff 0%, #f0f4ff 50%, #e6f0ff 100%);
+	--gradient-card: linear-gradient(
+		135deg,
+		rgba(255, 255, 255, 0.95) 0%,
+		rgba(246, 248, 250, 0.95) 100%
+	);
+
+	/* Shadow Values */
+	--shadow-sm: 0 4px 12px rgba(26, 127, 55, 0.3);
+	--shadow-md: 0 4px 20px rgba(0, 0, 0, 0.08);
+	--shadow-lg: 0 4px 15px rgba(0, 0, 0, 0.08);
+	--shadow-hover: 0 6px 20px rgba(9, 105, 218, 0.15);
+
+	/* Focus States */
+	--focus-ring: 0 0 0 2px rgba(9, 105, 218, 0.15);
+
+	color-scheme: light;
+}
+
+/* Default theme (fallback - light theme) */
+html {
+	/* Light theme as default */
+	--bg-primary: #e6f0ff;
+	--bg-secondary: #f0f4ff;
+	--bg-tertiary: rgba(255, 255, 255, 0.95);
+	--bg-card: rgba(246, 248, 250, 0.9);
+	--bg-input: white;
+	--text-primary: #24292f;
+	--text-heading: #0a1128;
+	--text-secondary: #57606a;
+	--text-accent: #0969da;
+	--border-primary: #d0d7de;
+	--border-secondary: #d0d7de;
+	--color-success: #1a7f37;
+	--color-success-hover: #116329;
+	--color-danger: #cf222e;
+	--color-danger-hover: #a40e26;
+	--color-info: #0969da;
+	--gradient-bg: linear-gradient(135deg, #e6f0ff 0%, #f0f4ff 50%, #e6f0ff 100%);
+	--gradient-card: linear-gradient(
+		135deg,
+		rgba(255, 255, 255, 0.95) 0%,
+		rgba(246, 248, 250, 0.95) 100%
+	);
+	--shadow-sm: 0 4px 12px rgba(26, 127, 55, 0.3);
+	--shadow-md: 0 4px 20px rgba(0, 0, 0, 0.08);
+	--shadow-lg: 0 4px 15px rgba(0, 0, 0, 0.08);
+	--shadow-hover: 0 6px 20px rgba(9, 105, 218, 0.15);
+	--focus-ring: 0 0 0 2px rgba(9, 105, 218, 0.15);
+	color-scheme: light;
+}

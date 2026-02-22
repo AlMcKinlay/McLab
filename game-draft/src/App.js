@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { fetchMetacriticScore } from "./metacritic";
+import { encodeToURL, decodeFromURL } from "shared-utils";
+import "shared-utils/theme-variables.css";
 import "./App.css";
 
 function App() {
@@ -28,30 +30,6 @@ function App() {
 		return "light";
 	});
 
-	const encodeShareData = (data) => {
-		const json = JSON.stringify(data);
-		const bytes = new TextEncoder().encode(json);
-		let binary = "";
-		bytes.forEach((b) => {
-			binary += String.fromCharCode(b);
-		});
-		return btoa(binary)
-			.replace(/\+/g, "-")
-			.replace(/\//g, "_")
-			.replace(/=+$/g, "");
-	};
-
-	const decodeShareData = (encoded) => {
-		let base64 = encoded.replace(/-/g, "+").replace(/_/g, "/");
-		while (base64.length % 4) {
-			base64 += "=";
-		}
-		const binary = atob(base64);
-		const bytes = Uint8Array.from(binary, (c) => c.charCodeAt(0));
-		const json = new TextDecoder().decode(bytes);
-		return JSON.parse(json);
-	};
-
 	// Load data from URL or localStorage on mount
 	useEffect(() => {
 		let saved = null;
@@ -59,7 +37,7 @@ function App() {
 		const sharedData = params.get("data");
 		if (sharedData) {
 			try {
-				const parsed = decodeShareData(sharedData);
+				const parsed = decodeFromURL(sharedData);
 				if (Array.isArray(parsed)) {
 					const savedData = localStorage.getItem("gameDraftData");
 					if (savedData) {
@@ -110,9 +88,9 @@ function App() {
 		}
 	}, [users, viewOnly]);
 
-	// Apply theme via data attribute on body
+	// Apply theme via data attribute on html (matches shared theme-variables.css)
 	useEffect(() => {
-		document.body.setAttribute("data-theme", theme);
+		document.documentElement.setAttribute("data-theme", theme);
 		localStorage.setItem("gameDraftTheme", theme);
 	}, [theme]);
 
@@ -124,7 +102,7 @@ function App() {
 	const handleShareLink = async () => {
 		setShareStatus(null);
 		try {
-			const encoded = encodeShareData(users);
+			const encoded = encodeToURL(users);
 			const url = new URL(window.location.href);
 			url.searchParams.set("data", encoded);
 

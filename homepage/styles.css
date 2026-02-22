@@ -3,102 +3,8 @@
    ============================================================================
    Uses the shared navy professional theme system with dark/light modes.
    Organized for readability and maintainability.
+   Theme variables are imported from shared-utils via script.js.
    =========================================================================== */
-
-/* ─────────────────────────────────────────────────────────────────────────
-   CSS VARIABLES - Navy Professional Theme System
-   ───────────────────────────────────────────────────────────────────────── */
-
-/* Dark Theme */
-html[data-theme="dark"] {
-	/* Primary Colors */
-	--bg-primary: #0a1128;
-	--bg-secondary: #1c2541;
-	--bg-tertiary: rgba(22, 27, 34, 0.9);
-	--bg-card: rgba(13, 17, 23, 0.7);
-
-	/* Text Colors */
-	--text-primary: #c9d1d9;
-	--text-heading: #e6edf3;
-	--text-secondary: #8b949e;
-	--text-accent: #79c0ff;
-
-	/* Border & Divider Colors */
-	--border-primary: #30363d;
-	--border-secondary: #21262d;
-
-	/* Action Colors */
-	--color-success: #238636;
-	--color-success-hover: #2ea043;
-	--color-danger: #da3633;
-
-	/* Background Gradients */
-	--gradient-bg: linear-gradient(135deg, #0a1128 0%, #1c2541 50%, #0a1128 100%);
-
-	/* Shadows */
-	--shadow-md: 0 4px 20px rgba(0, 0, 0, 0.5);
-	--shadow-lg: 0 4px 15px rgba(0, 0, 0, 0.4);
-	--shadow-hover: 0 6px 20px rgba(88, 166, 255, 0.2);
-
-	color-scheme: dark;
-}
-
-/* Light Theme */
-html[data-theme="light"] {
-	/* Primary Colors */
-	--bg-primary: #e6f0ff;
-	--bg-secondary: #f0f4ff;
-	--bg-tertiary: rgba(255, 255, 255, 0.95);
-	--bg-card: rgba(246, 248, 250, 0.9);
-
-	/* Text Colors */
-	--text-primary: #24292f;
-	--text-heading: #0a1128;
-	--text-secondary: #57606a;
-	--text-accent: #0969da;
-
-	/* Border & Divider Colors */
-	--border-primary: #d0d7de;
-	--border-secondary: #d0d7de;
-
-	/* Action Colors */
-	--color-success: #1a7f37;
-	--color-success-hover: #116329;
-	--color-danger: #cf222e;
-
-	/* Background Gradients */
-	--gradient-bg: linear-gradient(135deg, #e6f0ff 0%, #f0f4ff 50%, #e6f0ff 100%);
-
-	/* Shadows */
-	--shadow-md: 0 4px 20px rgba(0, 0, 0, 0.08);
-	--shadow-lg: 0 4px 15px rgba(0, 0, 0, 0.08);
-	--shadow-hover: 0 6px 20px rgba(9, 105, 218, 0.15);
-
-	color-scheme: light;
-}
-
-/* Default theme (fallback) - light theme */
-html {
-	/* Light theme as default */
-	--bg-primary: #e6f0ff;
-	--bg-secondary: #f0f4ff;
-	--bg-tertiary: rgba(255, 255, 255, 0.95);
-	--bg-card: rgba(246, 248, 250, 0.9);
-	--text-primary: #24292f;
-	--text-heading: #0a1128;
-	--text-secondary: #57606a;
-	--text-accent: #0969da;
-	--border-primary: #d0d7de;
-	--border-secondary: #d0d7de;
-	--color-success: #1a7f37;
-	--color-success-hover: #116329;
-	--color-danger: #cf222e;
-	--gradient-bg: linear-gradient(135deg, #e6f0ff 0%, #f0f4ff 50%, #e6f0ff 100%);
-	--shadow-md: 0 4px 20px rgba(0, 0, 0, 0.08);
-	--shadow-lg: 0 4px 15px rgba(0, 0, 0, 0.08);
-	--shadow-hover: 0 6px 20px rgba(9, 105, 218, 0.15);
-	color-scheme: light;
-}
 
 /* ─────────────────────────────────────────────────────────────────────────
    GLOBAL STYLES
@@ -108,6 +14,11 @@ html {
 	margin: 0;
 	padding: 0;
 	box-sizing: border-box;
+}
+
+html {
+	background: var(--gradient-bg);
+	color-scheme: light dark;
 }
 
 body {

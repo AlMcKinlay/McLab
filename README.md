@@ -111,13 +111,92 @@ If you add a new app, you’ll likely want to:
 - Netlify is the host for static apps and serverless functions.
 - Avoid introducing TypeScript unless explicitly requested (existing apps are JS).
 
+## Shared resources
+
+All apps have access to shared resources in the `/shared` directory:
+
+- **`shared/theme-variables.css`** - Consistent theme colors (dark/light navy professional)
+- **`shared/utils.js`** - Shared utilities (theme functions, URL encoding/decoding)
+- **`shared/package.json`** - Publishes `shared-utils` as a local package for CRA/React apps
+
+### Using shared utilities in React apps
+
+**For JavaScript utilities:**
+
+```javascript
+import { encodeToURL, decodeFromURL } from "shared-utils";
+import { initializeTheme, applyTheme, toggleTheme } from "shared-utils";
+```
+
+**For CSS:**
+
+Import in your `src/App.js` or main entry point:
+
+```javascript
+import "shared-utils/theme-variables.css";
+```
+
+This approach works because the `/shared` directory is registered as a local package in `package.json`:
+
+```json
+"shared-utils": "file:../shared"
+```
+
+Then CSS is imported from the JavaScript entry point, allowing webpack to properly resolve the node_modules path.
+
+### Using shared utilities in static HTML/JS apps
+
+**For CSS:**
+
+Add a link tag to your HTML:
+
+```html
+<link rel="stylesheet" href="../shared/theme-variables.css" />
+```
+
+**For JavaScript:**
+
+```javascript
+import { initializeTheme, toggleTheme } from "../shared/utils.js";
+```
+
 ## Conventions
 
 - Naming: folder name = subpath = homepage entry slug (e.g., `pokemon-list` → `/pokemon-list`).
 - Formatting: always run Prettier (tabs, tabWidth 2) and keep formatting consistent across apps.
-- Linting/testing: keep basic linting and tests enabled where available; no strict policy beyond that.
+- Linting/testing: keep basic linting and tests enabled where available; CSS linting via `npm run lint:css`.
 - Homepage cards use screenshots/thumbnails stored alongside the homepage assets.
 - Thumbnail naming convention: `homepage/<app>-thumbnail.png` (match the app slug).
+- **CSS imports:** For React apps, import shared CSS from JavaScript (not CSS @import) to avoid CRA path restrictions.
+
+## App structure template
+
+For consistency, new React apps should follow this structure:
+
+```
+my-app/
+├── package.json            (includes: "shared-utils": "file:../shared")
+├── public/
+│   ├── index.html          (add: <meta name="color-scheme" content="light dark" />)
+│   └── ...
+├── src/
+│   ├── App.css             (imports shared-styles, app-specific)
+│   ├── App.js              (imports shared CSS and utilities)
+│   ├── app-specific.css    (component-specific styles)
+│   ├── shared-styles.css   (optional: reusable component styles)
+│   ├── index.css           (global resets, body styles)
+│   ├── index.js            (entry point)
+│   └── ...
+├── README.md
+└── ...
+```
+
+### CSS organization in App.css
+
+```css@import url("../../shared/theme-variables.css");
+@import url("./shared-styles.css"); /* Optional: shared components */
+@import url("./app-specific.css"); /* App-specific styling */
+```
 
 ## Routing and Netlify notes
 
@@ -234,13 +313,70 @@ Key files:
 - `src/theme-variables.css`, `shared-styles.css`, `app-specific.css`: Modular CSS
 - `public/index.html`: Includes color-scheme meta tag
 
+## Potential improvements for future work
+
+These are structural changes that would reduce duplication and improve consistency:
+
+### 1. Centralized CSS System
+
+Currently theme variables are duplicated in each app. Better approach:
+
+- Create a `shared/` directory at the root with `theme.css` (or `theme-variables.css`)
+- Have all apps import from this single source
+- Prevents drift and makes color changes easier
+
+Benefit: One place to update colors instead of multiple files.
+
+### 2. Shared utilities library
+
+Both homepage and game-draft have duplicate code:
+
+- `initializeTheme()` and related functions (theme detection, toggle logic)
+- URL encoding/decoding functions
+- App card rendering logic
+
+Better: Extract into `shared/utils.js` or similar that apps can import.
+
+Benefit: DRY principle, easier to maintain, consistent behavior across apps.
+
+### 3. Homepage field standardization
+
+`game-draft/package.json` uses `"homepage": "https://lab.yamanickill.com/game-draft"` but should use relative path `/game-draft` to match other apps.
+
+Benefit: Works consistently in both local dev and production; Netlify can handle the domain.
+
+### 4. CSS linting
+
+Add `stylelint` to Prettier pipeline or as separate check to enforce CSS conventions:
+
+- Consistent selector format (e.g., always use `html[data-theme]`, never `body[data-theme]`)
+- Variable naming standards
+- Color consistency
+
+Benefit: Prevents the CSS selector bug we hit (body vs html); improves code quality.
+
+### 5. Consistent app structure
+
+Not critical but could standardize:
+
+- All apps use `src/` for source files
+- All apps export main CSS as `App.css` that imports theme and shared styles
+- Create a template/boilerplate for new apps
+
+Benefit: Faster onboarding, less decision-making for new projects.
+
 ## Adding a new app (quick checklist)
 
-- Create the app (React preferred unless requested otherwise).
-- Set `homepage` in the app’s `package.json` to the Netlify subpath.
-- Add a build target in the root `Makefile` and update `copyBuilds`.
-- Add the app to `homepage/script.js` (card + thumbnail).
-- If client-side routing is used, add a Netlify redirect for the subpath.
+1. **Create the app** (React preferred unless requested otherwise)
+2. **Follow the app structure template** (see "App structure template" section above)
+3. **Set `homepage`** in `package.json` to relative path (e.g., `/my-app`)
+4. **Import shared theme** in your main CSS: `@import url('../../shared/theme-variables.css');`
+5. **Add to homepage** in `homepage/script.js` (card definition + thumbnail image)
+6. **Add build target** to root `Makefile` and update `copyBuilds` step
+7. **Add color-scheme meta tag** to `public/index.html`: `<meta name="color-scheme" content="light dark" />`
+8. **Add theme toggle button** (optional): `<button class="theme-toggle" id="themeToggle">☀️</button>`
+9. **Initialize theme** in your JS if you added the toggle button (see `homepage/script.js` for example)
+10. **Run CSS linter** before committing: `npm run lint:css`
 
 ## Gaps / unknowns
 

@@ -8,10 +8,15 @@
 	"license": "MIT",
 	"type": "module",
 	"scripts": {
-		"build": "make build",
-		"dev": "make build && cd build && npx http-server -p 8080 -c-1",
+		"build": "npm run lint:css && make build",
+		"dev": "npm run lint:css && make build && cd build && npx http-server -p 8080 -c-1",
 		"homepage:dev": "cd homepage && npx http-server -p 8080 -c-1",
 		"telegram:dev": "cd telegram-bot && node --env-file=.env index.js",
-		"telegram:install": "cd telegram-bot && npm install"
+		"telegram:install": "cd telegram-bot && npm install",
+		"lint:css": "stylelint '**/*.css' --ignore-path .gitignore"
+	},
+	"devDependencies": {
+		"stylelint": "^16.0.0",
+		"stylelint-config-standard": "^36.0.0"
 	}
 }

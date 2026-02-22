@@ -1,0 +1,22 @@
+{
+	"extends": "stylelint-config-standard",
+	"rules": {
+		"indentation": "tab",
+		"max-empty-lines": 2,
+		"rule-empty-line-before": [
+			"always",
+			{
+				"except": ["after-single-line-comment", "first-nested"]
+			}
+		],
+		"comment-empty-line-before": [
+			"always",
+			{
+				"except": ["first-nested"]
+			}
+		],
+		"selector-attribute-quotes": "always",
+		"font-family-no-missing-generic-family-keyword": null,
+		"no-descending-specificity": null
+	}
+}

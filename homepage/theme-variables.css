@@ -1,12 +1,12 @@
 /* ============================================================================
-   THEME VARIABLES - Navy Professional Color System
+   SHARED THEME VARIABLES - Navy Professional Color System
    ============================================================================
    This file defines CSS custom properties for both dark and light themes.
-   Can be reused across all projects (game-draft, homepage, etc).
+   Import this in your main CSS file, then all apps will use consistent colors.
    =========================================================================== */
 
 /* Dark Theme - Navy Professional */
-body[data-theme="dark"] {
+html[data-theme="dark"] {
 	/* Primary Colors */
 	--bg-primary: #0a1128;
 	--bg-secondary: #1c2541;
@@ -52,7 +52,7 @@ body[data-theme="dark"] {
 }
 
 /* Light Theme - Navy Professional */
-body[data-theme="light"] {
+html[data-theme="light"] {
 	/* Primary Colors */
 	--bg-primary: #e6f0ff;
 	--bg-secondary: #f0f4ff;
@@ -97,8 +97,8 @@ body[data-theme="light"] {
 	color-scheme: light;
 }
 
-/* Default (fallback for system theme detection) */
-body {
+/* Default theme (fallback - light theme) */
+html {
 	/* Light theme as default */
 	--bg-primary: #e6f0ff;
 	--bg-secondary: #f0f4ff;

@@ -1,27 +1,25 @@
-// ============================================================================
-// THEME MANAGEMENT
-// ============================================================================
+/* ============================================================================
+   HOMEPAGE INITIALIZATION
+   ============================================================================
+   Theme CSS is loaded via link tag in index.html.
+   Theme functions are defined locally (shared via /shared/utils.js for reference).
+   =========================================================================== */
+
+/* ─────────────────────────────────────────────────────────────────────────
+   THEME MANAGEMENT (from shared/utils.js)
+   ───────────────────────────────────────────────────────────────────────── */
 
 function initializeTheme() {
-	// Check if user has a saved theme preference
 	const savedTheme = localStorage.getItem("theme");
-
-	// Check if system prefers dark mode
 	const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-
-	// Determine the initial theme
 	const initialTheme = savedTheme || (prefersDark ? "dark" : "light");
-
-	// Apply the theme
 	applyTheme(initialTheme);
 
-	// Set up the theme toggle button
 	const themeToggle = document.getElementById("themeToggle");
 	if (themeToggle) {
 		themeToggle.addEventListener("click", toggleTheme);
 	}
 
-	// Listen for system theme changes
 	window
 		.matchMedia("(prefers-color-scheme: dark)")
 		.addEventListener("change", (e) => {
@@ -35,8 +33,6 @@ function applyTheme(theme) {
 	document.documentElement.setAttribute("data-theme", theme);
 	localStorage.setItem("theme", theme);
 
-	// Update the toggle button emoji
-	// Show opposite icon: in dark mode, show sun (to switch to light); in light mode, show moon (to switch to dark)
 	const themeToggle = document.getElementById("themeToggle");
 	if (themeToggle) {
 		themeToggle.textContent = theme === "dark" ? "☀️" : "🌙";
@@ -50,9 +46,13 @@ function toggleTheme() {
 	applyTheme(newTheme);
 }
 
-// ============================================================================
-// APP CONFIGURATION & RENDERING
-// ============================================================================
+/* ─────────────────────────────────────────────────────────────────────────
+   INITIALIZATION
+   ───────────────────────────────────────────────────────────────────────── */
+
+/* ─────────────────────────────────────────────────────────────────────────
+   APP CONFIGURATION & RENDERING
+   ───────────────────────────────────────────────────────────────────────── */
 
 // App configuration - add new apps here
 const apps = [

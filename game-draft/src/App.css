@@ -2,11 +2,10 @@
    APP.CSS - Game Draft Application Styles
    ============================================================================
    Imports all CSS modules:
-   - theme-variables.css: Navy professional dark/light theme variables
+   - theme variables imported from shared-utils in App.js
    - shared-styles.css: Base styles reusable across projects
    - app-specific.css: Game-draft specific components
    =========================================================================== */
 
-@import url("./theme-variables.css");
 @import url("./shared-styles.css");
 @import url("./app-specific.css");
