@@ -110,7 +110,7 @@ h2 {
 	transition: all 0.2s;
 	flex-shrink: 0;
 	background: var(--color-danger);
-	color: #fff;
+	color: var(--text-contrast);
 	font-weight: 600;
 }
 
@@ -167,7 +167,7 @@ h2 {
 
 .btn-primary {
 	background: var(--color-success);
-	color: #fff;
+	color: var(--text-contrast);
 }
 
 .btn-primary:hover:not(:disabled) {

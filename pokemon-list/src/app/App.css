@@ -100,7 +100,7 @@ main {
 	top: 0.25rem;
 	right: 0.25rem;
 	background-color: var(--action-primary);
-	color: #fff;
+	color: var(--text-contrast);
 	border-radius: 50%;
 	width: 1.5rem;
 	height: 1.5rem;

@@ -52,7 +52,7 @@ const Completed = styled.div`
 		100% 100%,
 		auto;
 	background-color: var(--color-success) !important;
-	color: #fff;
+	color: var(--text-contrast);
 	border-color: var(--color-success-hover) !important;
 `;
 
