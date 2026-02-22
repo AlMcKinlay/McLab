@@ -6,10 +6,10 @@ import App from "./App";
 import * as serviceWorker from "./serviceWorker";
 import { initializeTheme } from "shared-utils";
 
-const root = createRoot(document.getElementById("root"));
-
-// Initialize theme
+// Initialize theme before rendering to prevent flickering
 initializeTheme();
+
+const root = createRoot(document.getElementById("root"));
 
 root.render(<App />);
 

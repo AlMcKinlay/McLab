@@ -23,11 +23,17 @@
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
 		<title>Bingo</title>
+		<script>
+			// Set theme immediately to prevent flash of unstyled content
+			const savedTheme = localStorage.getItem("theme");
+			const prefersDark = window.matchMedia(
+				"(prefers-color-scheme: dark)",
+			).matches;
+			const theme = savedTheme || (prefersDark ? "dark" : "light");
+			document.documentElement.setAttribute("data-theme", theme);
+		</script>
 	</head>
 	<body>
-		<button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
-			☀️
-		</button>
 		<noscript>You need to enable JavaScript to run this app.</noscript>
 		<div id="root"></div>
 		<!--

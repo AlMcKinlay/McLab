@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./App.css";
 import { regions, REGIONS } from "./regions";
 import GameEntry from "./GameEntry";
+import { initializeTheme } from "shared-utils";
 
 const getData = async (regionKey) => {
 	const prices = [];
@@ -25,7 +26,7 @@ const getData = async (regionKey) => {
 		.then((data) =>
 			data.forEach((doc) => {
 				prices.push(region.map(doc));
-			})
+			}),
 		)
 		.then(() => prices);
 };
@@ -33,6 +34,11 @@ const getData = async (regionKey) => {
 function App() {
 	const [prices, setPrices] = useState([]);
 	const [region, setRegion] = useState(REGIONS.EU);
+
+	useEffect(() => {
+		initializeTheme();
+	}, []);
+
 	const changeRegion = (newRegion) => {
 		setRegion(newRegion);
 		setPrices([]);
@@ -42,6 +48,13 @@ function App() {
 	}
 	return (
 		<div className="App">
+			<button
+				className="theme-toggle"
+				id="themeToggle"
+				aria-label="Toggle dark mode"
+			>
+				☀️
+			</button>
 			<header className="App-header">Switch sales</header>
 			<select
 				value={region}
@@ -57,7 +70,6 @@ function App() {
 				<thead>
 					<tr>
 						<th>Title</th>
-						<th>Metacritic score</th>
 						<th>Sale Price</th>
 						<th>Normal Price</th>
 						<th>Discount</th>

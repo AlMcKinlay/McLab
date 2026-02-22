@@ -81,6 +81,13 @@ function App() {
 
 	return (
 		<div className="App">
+			<button
+				className="theme-toggle"
+				id="themeToggle"
+				aria-label="Toggle dark mode"
+			>
+				☀️
+			</button>
 			<div className="App-header">
 				<div className="bingo-section">
 					<BingoWrapper>
