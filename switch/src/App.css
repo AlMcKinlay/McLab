@@ -34,19 +34,13 @@
 }
 
 .App-header {
-	background-color: var(--bg-secondary);
-	min-height: 10vh;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-	font-size: calc(10px + 2vmin);
-	color: var(--text-primary);
-	padding: 1.5rem;
-	border-radius: 0.5rem;
-	border: 1px solid var(--border-color);
-	margin-bottom: 2rem;
-	box-shadow: var(--shadow-sm);
+	background: transparent;
+	padding: 0 0 2rem 0;
+	border-bottom: 1px solid var(--border-primary);
+	font-size: 2.5rem;
+	font-weight: 600;
+	color: var(--text-heading);
+	letter-spacing: 1px;
 }
 
 .App-logo {
