@@ -29,7 +29,7 @@ function App() {
 					selected={selected}
 				></SelectionList>
 				<div className="list">
-					<OutputSettings clear={clear}></OutputSettings>
+					<OutputSettings clear={clear} selected={selected}></OutputSettings>
 					<OutputList
 						selected={selected}
 						unselectPokemon={unselectPokemon}

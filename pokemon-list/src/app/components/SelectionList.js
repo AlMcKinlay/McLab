@@ -4,7 +4,7 @@ import PokemonList from "./PokemonList";
 import Filter from "./Filter";
 
 function SelectionList({ selectPokemon, selected }) {
-	const [filter, setFilter] = useState({ name: "" });
+	const [filter, setFilter] = useState({ name: "", types: [] });
 	let getTop = () => {};
 	const getGetTop = (func) => {
 		getTop = func;
