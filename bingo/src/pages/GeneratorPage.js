@@ -29,6 +29,7 @@ const randomiseArgs = (argsToRandomise) => {
 function GeneratorPage() {
 	const [args, setArgs] = useState("");
 	const [name, setName] = useState("");
+	const [quantity, setQuantity] = useState(1);
 	const [boards, setBoards] = useState([]);
 	const [editingId, setEditingId] = useState(null);
 	const [editingName, setEditingName] = useState("");
@@ -53,30 +54,36 @@ function GeneratorPage() {
 			return;
 		}
 
-		// Find the next number for boards with this base name
 		const baseName = name.trim() || "Board";
-		const existingNumbers = boards
-			.filter((b) => b.name?.startsWith(baseName))
-			.map((b) => {
-				const match = b.name.match(new RegExp(`^${baseName}\\s+(\\d+)$`));
-				return match ? parseInt(match[1], 10) : 0;
-			})
-			.filter((n) => !isNaN(n));
+		const newBoards = [];
 
-		const nextNumber =
-			existingNumbers.length > 0 ? Math.max(...existingNumbers) + 1 : 1;
-		const boardName = `${baseName} ${nextNumber}`;
+		for (let i = 0; i < quantity; i++) {
+			const existingNumbers = boards
+				.filter((b) => b.name?.startsWith(baseName))
+				.map((b) => {
+					const match = b.name.match(new RegExp(`^${baseName}\\s+(\\d+)$`));
+					return match ? parseInt(match[1], 10) : 0;
+				})
+				.filter((n) => !isNaN(n));
 
-		const boardId = generateBoardId();
-		const newBoard = {
-			id: boardId,
-			name: boardName,
-			items: items.slice(0, 24),
-			createdAt: new Date().toISOString(),
-			shareUrl: createShareUrl(items.slice(0, 24), boardName),
-		};
+			const nextNumber =
+				existingNumbers.length > 0
+					? Math.max(...existingNumbers) + 1 + i
+					: 1 + i;
+			const boardName = `${baseName} ${nextNumber}`;
 
-		setBoards([newBoard, ...boards]);
+			const boardId = generateBoardId();
+			const newBoard = {
+				id: boardId,
+				name: boardName,
+				items: items.slice(0, 24),
+				createdAt: new Date().toISOString(),
+				shareUrl: createShareUrl(items.slice(0, 24), boardName),
+			};
+			newBoards.push(newBoard);
+		}
+
+		setBoards([...newBoards, ...boards]);
 	};
 
 	const handleDeleteBoard = (boardId) => {
@@ -153,6 +160,32 @@ function GeneratorPage() {
 						placeholder="Board"
 						style={{ width: "100%" }}
 					/>
+				</div>
+				<div style={{ display: "flex", gap: "1rem", marginTop: "1rem" }}>
+					<div style={{ flex: 1 }}>
+						<label
+							htmlFor="quantity"
+							style={{
+								display: "block",
+								marginBottom: "0.5rem",
+								fontWeight: "600",
+							}}
+						>
+							Quantity:
+						</label>
+						<input
+							id="quantity"
+							type="number"
+							min="1"
+							max="10"
+							className="game-input"
+							value={quantity}
+							onChange={(event) =>
+								setQuantity(Math.max(1, parseInt(event.target.value) || 1))
+							}
+							style={{ width: "100%" }}
+						/>
+					</div>
 				</div>
 				<Args
 					className="game-input"
