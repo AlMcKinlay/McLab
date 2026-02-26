@@ -12,13 +12,6 @@ const BingoWrapper = styled.div`
 	aspect-ratio: 1;
 `;
 
-const ArgsWrapper = styled.div`
-	width: 100%;
-	display: flex;
-	flex-direction: column;
-	gap: 1.5rem;
-`;
-
 const GenerateButton = styled.button``;
 
 const Args = styled.textarea``;
