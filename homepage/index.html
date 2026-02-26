@@ -1,25 +1,31 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>McLab - Tools & Apps</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-    <div class="container">
-        <header>
-            <h1>McLab</h1>
-            <p class="subtitle">A collection of useful tools</p>
-        </header>
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta name="color-scheme" content="light dark" />
+		<title>McLab - Tools & Apps</title>
+		<link rel="stylesheet" href="theme-variables.css" />
+		<link rel="stylesheet" href="styles.css" />
+	</head>
+	<body>
+		<button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+			☀️
+		</button>
 
-        <main>
-            <div class="apps-grid" id="appsGrid">
-                <!-- Apps will be populated by JavaScript -->
-            </div>
-        </main>
-    </div>
+		<div class="container">
+			<header>
+				<h1>McLab</h1>
+				<p class="subtitle">A collection of useful tools</p>
+			</header>
 
-    <script src="script.js"></script>
-</body>
+			<main>
+				<div class="apps-grid" id="appsGrid">
+					<!-- Apps will be populated by JavaScript -->
+				</div>
+			</main>
+		</div>
+
+		<script src="script.js"></script>
+	</body>
 </html>

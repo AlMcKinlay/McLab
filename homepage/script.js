@@ -1,5 +1,75 @@
+/* ============================================================================
+   HOMEPAGE INITIALIZATION
+   ============================================================================
+   Theme CSS is loaded via link tag in index.html.
+   Theme functions are defined locally (shared via /shared/utils.js for reference).
+   =========================================================================== */
+
+/* ─────────────────────────────────────────────────────────────────────────
+   THEME MANAGEMENT (from shared/utils.js)
+   ───────────────────────────────────────────────────────────────────────── */
+
+function initializeTheme() {
+	const savedTheme = localStorage.getItem("theme");
+	const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+	const initialTheme = savedTheme || (prefersDark ? "dark" : "light");
+	applyTheme(initialTheme);
+
+	const themeToggle = document.getElementById("themeToggle");
+	if (themeToggle) {
+		themeToggle.addEventListener("click", toggleTheme);
+	}
+
+	window
+		.matchMedia("(prefers-color-scheme: dark)")
+		.addEventListener("change", (e) => {
+			if (!localStorage.getItem("theme")) {
+				applyTheme(e.matches ? "dark" : "light");
+			}
+		});
+}
+
+function applyTheme(theme) {
+	document.documentElement.setAttribute("data-theme", theme);
+	localStorage.setItem("theme", theme);
+
+	const themeToggle = document.getElementById("themeToggle");
+	if (themeToggle) {
+		themeToggle.textContent = theme === "dark" ? "☀️" : "🌙";
+	}
+}
+
+function toggleTheme() {
+	const currentTheme =
+		document.documentElement.getAttribute("data-theme") || "light";
+	const newTheme = currentTheme === "light" ? "dark" : "light";
+	applyTheme(newTheme);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   INITIALIZATION
+   ───────────────────────────────────────────────────────────────────────── */
+
+/* ─────────────────────────────────────────────────────────────────────────
+   APP CONFIGURATION & RENDERING
+   ───────────────────────────────────────────────────────────────────────── */
+
 // App configuration - add new apps here
 const apps = [
+	{
+		id: "game-draft",
+		title: "Game Draft",
+		description: "Track Metacritic scores for your fantasy game draft",
+		url: "/game-draft",
+		thumbnail: "./game-draft-thumbnail.png",
+	},
+	{
+		id: "switch",
+		title: "Switch",
+		description: "Nintendo Switch game sale tracker",
+		url: "/switch",
+		thumbnail: "./switch-thumbnail.png",
+	},
 	{
 		id: "pokemon-list",
 		title: "Pokemon List",
@@ -8,25 +78,11 @@ const apps = [
 		thumbnail: "./pokemon-thumbnail.png",
 	},
 	{
-		id: "switch",
-		title: "Switch",
-		description: "Nintendo Switch game tracker",
-		url: "/switch",
-		thumbnail: "./switch-thumbnail.png",
-	},
-	{
 		id: "bingo",
 		title: "Bingo",
-		description: "Interactive bingo game",
+		description: "Create randomly generated bingo card from input",
 		url: "/bingo",
 		thumbnail: "./bingo-thumbnail.png",
-	},
-	{
-		id: "game-draft",
-		title: "Game Draft",
-		description: "Track Metacritic scores for your fantasy game draft",
-		url: "/game-draft",
-		thumbnail: "./game-draft-thumbnail.png",
 	},
 ];
 
@@ -35,6 +91,7 @@ const appsGrid = document.getElementById("appsGrid");
 
 // Initialize the homepage
 function initializeHomepage() {
+	initializeTheme();
 	renderApps();
 }
 
@@ -46,13 +103,13 @@ function renderApps() {
 // Create a single app card
 function createAppCard(app) {
 	const thumbnailHtml = app.thumbnailFallback
-		? `<div class="app-thumbnail" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center;">
+		? `<div class="app-thumbnail" style="display: flex; align-items: center; justify-content: center;">
              <span style="color: white; font-size: 2rem; font-weight: bold;">${app.title.charAt(
 								0,
 							)}</span>
            </div>`
 		: `<div class="app-thumbnail">
-             <img src="${app.thumbnail}" alt="${app.title}" onerror="this.parentElement.style.backgroundImage='linear-gradient(135deg, #667eea 0%, #764ba2 100%)'; this.style.display='none';">
+             <img src="${app.thumbnail}" alt="${app.title}" onerror="this.parentElement.style.display='flex'; this.style.display='none';">
            </div>`;
 
 	return `

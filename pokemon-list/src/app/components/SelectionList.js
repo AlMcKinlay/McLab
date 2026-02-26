@@ -3,8 +3,8 @@ import { useState } from "react";
 import PokemonList from "./PokemonList";
 import Filter from "./Filter";
 
-function SelectionList({ selectPokemon }) {
-	const [filter, setFilter] = useState({ name: "" });
+function SelectionList({ selectPokemon, selected }) {
+	const [filter, setFilter] = useState({ name: "", types: [] });
 	let getTop = () => {};
 	const getGetTop = (func) => {
 		getTop = func;
@@ -24,6 +24,7 @@ function SelectionList({ selectPokemon }) {
 				filter={filter}
 				selectPokemon={selectPokemon}
 				getGetTop={getGetTop}
+				selected={selected}
 			></PokemonList>
 		</div>
 	);

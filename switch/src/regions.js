@@ -1,5 +1,4 @@
 import fetchJsonp from "fetch-jsonp";
-import { load } from "cheerio";
 
 export const REGIONS = {
 	EU: "Europe",
@@ -10,21 +9,6 @@ const PRICE = {};
 PRICE[250] =
 	"price_lowest_f%3A%220%22%20OR%20price_lowest_f%3A%5B0.01%20TO%202.49%5D";
 PRICE[500] = PRICE[250] + "%20OR%20price_lowest_f%3A%5B2.5%20TO%204.99%5D";
-
-export const getMetacritic = (name) =>
-	fetch(
-		`https://cors-anywhere.herokuapp.com/https://www.metacritic.com/search/game/${name}/results?plats[268409]=1&search_type=advanced`,
-	)
-		.then((res) => res.text())
-		.then((html) => load(html))
-		.then(($) => {
-			return {
-				score: $(".metascore_w")[0] && $(".metascore_w")[0].children[0].data,
-				url:
-					$(".product_title")[0] &&
-					$(".product_title")[0].children[1].attribs.href,
-			};
-		});
 
 export const regions = {
 	[REGIONS.EU]: {

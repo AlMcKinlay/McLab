@@ -1,0 +1,167 @@
+/* ============================================================================
+   SHARED THEME VARIABLES - Navy Professional Color System
+   ============================================================================
+   This file defines CSS custom properties for both dark and light themes.
+   Import this in your main CSS file, then all apps will use consistent colors.
+   =========================================================================== */
+
+/* Dark Theme - Navy Professional */
+html[data-theme="dark"] {
+	/* Primary Colors */
+	--bg-primary: #0a1128;
+	--bg-secondary: #1c2541;
+	--bg-tertiary: rgba(22 27 34 / 90%);
+	--bg-card: rgba(13 17 23 / 70%);
+	--bg-input: rgba(13 17 23 / 90%);
+
+	/* Text Colors */
+	--text-primary: #c9d1d9;
+	--text-heading: #e6edf3;
+	--text-secondary: #8b949e;
+	--text-accent: #79c0ff;
+	--text-contrast: #fff;
+
+	/* Border & Divider Colors */
+	--border-primary: #30363d;
+	--border-secondary: #21262d;
+
+	/* Action Colors */
+	--color-success: #238636;
+	--color-success-hover: #2ea043;
+	--color-danger: #da3633;
+	--color-danger-hover: #f85149;
+	--color-info: #58a6ff;
+
+	/* Tinted Backgrounds for Messages & Alerts */
+	--bg-danger-tint: rgb(207 34 46 / 10%);
+	--bg-danger-border: rgb(207 34 46 / 30%);
+	--bg-info-tint: rgb(9 105 218 / 10%);
+	--bg-info-border: rgb(9 105 218 / 25%);
+	--bg-info-subtle: rgb(9 105 218 / 8%);
+	--bg-info-border-subtle: rgb(9 105 218 / 20%);
+
+	/* Toggle Button */
+	--toggle-bg: rgb(128 128 128 / 30%);
+	--toggle-bg-hover: rgb(128 128 128 / 50%);
+
+	/* Background Gradients */
+	--gradient-bg: linear-gradient(135deg, #0a1128 0%, #1c2541 50%, #0a1128 100%);
+	--gradient-card: linear-gradient(
+		135deg,
+		rgba(22 27 34 / 80%) 0%,
+		rgba(13 17 23 / 80%) 100%
+	);
+
+	/* Shadow Values */
+	--shadow-sm: 0 4px 12px rgba(46 160 67 / 30%);
+	--shadow-md: 0 4px 20px rgba(0 0 0 / 50%);
+	--shadow-lg: 0 4px 15px rgba(0 0 0 / 40%);
+	--shadow-hover: 0 6px 20px rgba(88 166 255 / 20%);
+
+	/* Focus States */
+	--focus-ring: 0 0 0 2px rgba(88 166 255 / 20%);
+
+	color-scheme: dark;
+}
+
+/* Light Theme - Navy Professional */
+html[data-theme="light"] {
+	/* Primary Colors */
+	--bg-primary: #e6f0ff;
+	--bg-secondary: #f0f4ff;
+	--bg-tertiary: rgba(255 255 255 / 95%);
+	--bg-card: rgba(246 248 250 / 90%);
+	--bg-input: #fff;
+
+	/* Text Colors */
+	--text-primary: #24292f;
+	--text-heading: #0a1128;
+	--text-secondary: #57606a;
+	--text-accent: #0969da;
+	--text-contrast: #000;
+
+	/* Border & Divider Colors */
+	--border-primary: #d0d7de;
+	--border-secondary: #d0d7de;
+
+	/* Action Colors */
+	--color-success: #1a7f37;
+	--color-success-hover: #116329;
+	--color-danger: #cf222e;
+	--color-danger-hover: #a40e26;
+	--color-info: #0969da;
+
+	/* Tinted Backgrounds for Messages & Alerts */
+	--bg-danger-tint: rgb(207 34 46 / 10%);
+	--bg-danger-border: rgb(207 34 46 / 30%);
+	--bg-info-tint: rgb(9 105 218 / 10%);
+	--bg-info-border: rgb(9 105 218 / 25%);
+	--bg-info-subtle: rgb(9 105 218 / 8%);
+	--bg-info-border-subtle: rgb(9 105 218 / 20%);
+
+	/* Toggle Button */
+	--toggle-bg: rgb(128 128 128 / 30%);
+	--toggle-bg-hover: rgb(128 128 128 / 50%);
+
+	/* Background Gradients */
+	--gradient-bg: linear-gradient(135deg, #e6f0ff 0%, #f0f4ff 50%, #e6f0ff 100%);
+	--gradient-card: linear-gradient(
+		135deg,
+		rgba(255 255 255 / 95%) 0%,
+		rgba(246 248 250 / 95%) 100%
+	);
+
+	/* Shadow Values */
+	--shadow-sm: 0 4px 12px rgba(26 127 55 / 30%);
+	--shadow-md: 0 4px 20px rgba(0 0 0 / 8%);
+	--shadow-lg: 0 4px 15px rgba(0 0 0 / 8%);
+	--shadow-hover: 0 6px 20px rgba(9 105 218 / 15%);
+
+	/* Focus States */
+	--focus-ring: 0 0 0 2px rgba(9 105 218 / 15%);
+
+	color-scheme: light;
+}
+
+/* Default theme (fallback - light theme) */
+html {
+	/* Light theme as default */
+	--bg-primary: #e6f0ff;
+	--bg-secondary: #f0f4ff;
+	--bg-tertiary: rgba(255 255 255 / 95%);
+	--bg-card: rgba(246 248 250 / 90%);
+	--bg-input: #fff;
+	--text-primary: #24292f;
+	--text-heading: #0a1128;
+	--text-secondary: #57606a;
+	--text-accent: #0969da;
+	--text-contrast: #000;
+	--border-primary: #d0d7de;
+	--border-secondary: #d0d7de;
+	--color-success: #1a7f37;
+	--color-success-hover: #116329;
+	--color-danger: #cf222e;
+	--color-danger-hover: #a40e26;
+	--color-info: #0969da;
+	--bg-danger-tint: rgb(207 34 46 / 10%);
+	--bg-danger-border: rgb(207 34 46 / 30%);
+	--bg-info-tint: rgb(9 105 218 / 10%);
+	--bg-info-border: rgb(9 105 218 / 25%);
+	--bg-info-subtle: rgb(9 105 218 / 8%);
+	--bg-info-border-subtle: rgb(9 105 218 / 20%);
+	--toggle-bg: rgb(128 128 128 / 30%);
+	--toggle-bg-hover: rgb(128 128 128 / 50%);
+	--gradient-bg: linear-gradient(135deg, #e6f0ff 0%, #f0f4ff 50%, #e6f0ff 100%);
+	--gradient-card: linear-gradient(
+		135deg,
+		rgba(255 255 255 / 95%) 0%,
+		rgba(246 248 250 / 95%) 100%
+	);
+	--shadow-sm: 0 4px 12px rgba(26 127 55 / 30%);
+	--shadow-md: 0 4px 20px rgba(0 0 0 / 8%);
+	--shadow-lg: 0 4px 15px rgba(0 0 0 / 8%);
+	--shadow-hover: 0 6px 20px rgba(9 105 218 / 15%);
+	--focus-ring: 0 0 0 2px rgba(9 105 218 / 15%);
+
+	color-scheme: light;
+}

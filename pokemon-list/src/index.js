@@ -1,8 +1,13 @@
 import { createRoot } from "react-dom/client";
 import React from "react";
+import "shared-utils/theme-variables.css";
+import "shared-utils/shared-styles.css";
 import "./index.css";
 import App from "./app/App";
 import reportWebVitals from "./reportWebVitals";
+import { initializeTheme } from "shared-utils";
+
+initializeTheme();
 
 const root = createRoot(document.getElementById("root"));
 

@@ -8,9 +8,24 @@
 	"license": "MIT",
 	"type": "module",
 	"scripts": {
-		"dev": "make build && cd build && npx http-server -p 8080 -c-1",
-		"homepage:dev": "cd homepage && npx http-server -p 8080 -c-1",
+		"build": "npm run lint:css && make build",
+		"dev": "npm run build && netlify dev",
+		"bingo:dev": "cd bingo && netlify dev",
+		"game-draft:dev": "cd game-draft && netlify dev",
+		"homepage:dev": "cd homepage && netlify dev",
+		"pokemon-list:dev": "cd pokemon-list && netlify dev",
 		"telegram:dev": "cd telegram-bot && node --env-file=.env index.js",
-		"telegram:install": "cd telegram-bot && npm install"
+		"switch:dev": "cd switch && netlify dev",
+		"lint:css": "stylelint '**/*.css' --ignore-path .gitignore",
+		"prepare": "husky"
+	},
+	"lint-staged": {
+		"**/*.css": "stylelint --ignore-path .gitignore"
+	},
+	"devDependencies": {
+		"husky": "^9.1.7",
+		"lint-staged": "^16.2.7",
+		"stylelint": "^16.0.0",
+		"stylelint-config-standard": "^36.0.0"
 	}
 }

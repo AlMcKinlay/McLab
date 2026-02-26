@@ -35,7 +35,11 @@ copyBuilds:
 	mv switch/build build/switch
 	mv game-draft/build build/game-draft
 	cp homepage/* build/
+	cp shared/theme-variables.css build/
 
-build: buildBingo buildFunctions buildPokemonList buildSwitch buildGameDraft copyBuilds
+build: npm_install buildBingo buildFunctions buildPokemonList buildSwitch buildGameDraft copyBuilds
 
-.PHONY: build
+npm_install:
+	npm install
+
+.PHONY: build npm_install
