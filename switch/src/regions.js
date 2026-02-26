@@ -1,5 +1,4 @@
 import fetchJsonp from "fetch-jsonp";
-import { load } from "cheerio";
 
 export const REGIONS = {
 	EU: "Europe",
