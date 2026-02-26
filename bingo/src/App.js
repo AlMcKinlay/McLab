@@ -12,7 +12,6 @@ function App() {
 		initializeTheme();
 	}, []);
 
-	// Check if we have a board in the URL to determine which page to show
 	const isViewingBoard = getBoardDataFromUrl() !== null;
 
 	return isViewingBoard ? <ViewerPage /> : <GeneratorPage />;

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
-import Bingo from "../bingo";
+import Bingo from "../components/Board";
 import {
 	getBoardDataFromUrl,
 	loadBoardProgress,

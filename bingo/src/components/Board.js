@@ -56,7 +56,7 @@ const Completed = styled.div`
 	border-color: var(--color-success-hover) !important;
 `;
 
-function Bingo({
+function Board({
 	args,
 	completed,
 	complete,
@@ -123,4 +123,4 @@ function Bingo({
 	);
 }
 
-export default Bingo;
+export default Board;
