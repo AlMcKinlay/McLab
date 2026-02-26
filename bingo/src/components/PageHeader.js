@@ -10,7 +10,14 @@ function PageHeader({ title }) {
 			>
 				☀️
 			</button>
-			<header className="App-header">{title}</header>
+			<header className="App-header">
+				<a
+					href={window.location.pathname}
+					style={{ color: "inherit", textDecoration: "none" }}
+				>
+					{title}
+				</a>
+			</header>
 		</>
 	);
 }
