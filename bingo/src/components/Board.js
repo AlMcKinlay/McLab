@@ -63,11 +63,12 @@ function Board({
 	clearChecked,
 	needMore,
 	onCreateNew,
+	freeSpaceText = "Free space",
 }) {
 	let entries = [];
 	if (args.length >= 24) {
 		entries = args.slice(0, 24);
-		entries.splice(12, 0, "Free space");
+		entries.splice(12, 0, freeSpaceText);
 	}
 	return (
 		<Wrapper>
