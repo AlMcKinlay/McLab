@@ -27,6 +27,7 @@ const ViewerContainer = styled.div`
 function ViewerPage() {
 	const [boardItems, setBoardItems] = useState(null);
 	const [boardName, setBoardName] = useState(null);
+	const [freeSpaceText, setFreeSpaceText] = useState("Free space");
 	const [completed, setCompleted] = useState({});
 	const [boardId, setBoardId] = useState(null);
 
@@ -35,8 +36,10 @@ function ViewerPage() {
 		if (data) {
 			const items = data.items || data;
 			const name = data.name;
+			const freeSpace = data.freeSpaceText || "Free space";
 			setBoardItems(items);
 			setBoardName(name);
+			setFreeSpaceText(freeSpace);
 
 			const id = btoa(JSON.stringify(items));
 			setBoardId(id);
@@ -47,6 +50,7 @@ function ViewerPage() {
 				id: id,
 				name: name,
 				items: items,
+				freeSpaceText: freeSpace,
 				createdAt: new Date().toISOString(),
 				shareUrl: window.location.href,
 			});
@@ -89,6 +93,7 @@ function ViewerPage() {
 						clearChecked={clearChecked}
 						needMore={false}
 						onCreateNew={window.location.pathname}
+						freeSpaceText={freeSpaceText}
 					></Bingo>
 				</BingoWrapper>
 			</ViewerContainer>

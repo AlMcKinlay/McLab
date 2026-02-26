@@ -80,7 +80,11 @@ function GeneratorPage() {
 				items: items.slice(0, 24),
 				freeSpaceText: freeSpaceText.trim() || "Free space",
 				createdAt: new Date().toISOString(),
-				shareUrl: createShareUrl(items.slice(0, 24), boardName),
+				shareUrl: createShareUrl(
+					items.slice(0, 24),
+					boardName,
+					freeSpaceText.trim() || "Free space",
+				),
 			};
 			newBoards.push(newBoard);
 		}
@@ -106,7 +110,11 @@ function GeneratorPage() {
 						? {
 								...b,
 								name: editingName.trim(),
-								shareUrl: createShareUrl(b.items, editingName.trim()),
+								shareUrl: createShareUrl(
+									b.items,
+									editingName.trim(),
+									b.freeSpaceText,
+								),
 							}
 						: b,
 				),

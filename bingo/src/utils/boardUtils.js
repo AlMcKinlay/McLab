@@ -4,8 +4,15 @@ export const STORAGE_KEYS = {
 	BOARD_PREFIX: "bingo.board.",
 };
 
-export const encodeBoardData = (items, name) => {
-	const data = name ? { name, items } : items;
+export const encodeBoardData = (items, name, freeSpaceText) => {
+	const data =
+		name || freeSpaceText
+			? {
+					items,
+					...(name && { name }),
+					...(freeSpaceText && { freeSpaceText }),
+				}
+			: items;
 	const json = JSON.stringify(data);
 	return btoa(json).replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "");
 };
@@ -18,11 +25,15 @@ export const decodeBoardData = (encoded) => {
 			.replace(/_/g, "/");
 		const json = atob(standardBase64);
 		const parsed = JSON.parse(json);
-		// Handle both old format (array) and new format (object with name and items)
+		// Handle both old format (array) and new format (object with name/freeSpaceText and items)
 		if (Array.isArray(parsed)) {
-			return { items: parsed, name: null };
+			return { items: parsed, name: null, freeSpaceText: null };
 		}
-		return parsed;
+		return {
+			items: parsed.items || parsed,
+			name: parsed.name || null,
+			freeSpaceText: parsed.freeSpaceText || null,
+		};
 	} catch (error) {
 		console.error("Failed to decode board data:", error);
 		return null;
@@ -42,8 +53,8 @@ export const getBoardDataFromUrl = () => {
 	return null;
 };
 
-export const createShareUrl = (items, name) => {
-	const encoded = encodeBoardData(items, name);
+export const createShareUrl = (items, name, freeSpaceText) => {
+	const encoded = encodeBoardData(items, name, freeSpaceText);
 	const baseUrl = window.location.origin + window.location.pathname;
 	return `${baseUrl}?board=${encoded}`;
 };
