@@ -212,12 +212,25 @@ function GeneratorPage() {
 						/>
 					</div>
 				</div>
-				<Args
-					className="game-input"
-					value={args}
-					onChange={(event) => setArgs(event.target.value)}
-					placeholder="Enter newline separated values"
-				></Args>
+				<div>
+					<label
+						htmlFor="args"
+						style={{
+							display: "block",
+							marginBottom: "0.5rem",
+							fontWeight: "600",
+						}}
+					>
+						Bingo Items:
+					</label>
+					<Args
+						id="args"
+						className="game-input"
+						value={args}
+						onChange={(event) => setArgs(event.target.value)}
+						placeholder="Enter newline separated values"
+					></Args>
+				</div>
 				<div className="button-container">
 					<button className="btn btn-primary" onClick={handleGenerateBoard}>
 						Generate Board
