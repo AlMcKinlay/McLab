@@ -45,7 +45,10 @@ function GeneratorPage() {
 	const handleGenerateBoard = () => {
 		const items = randomiseArgs(args);
 		if (items.length < 24) {
-			setNotification("You need at least 24 items to generate a bingo board");
+			setNotification({
+				message: "You need at least 24 items to generate a bingo board",
+				type: "error",
+			});
 			setTimeout(() => setNotification(null), 3000);
 			return;
 		}
@@ -112,7 +115,10 @@ function GeneratorPage() {
 	const handleCopyShareUrl = (shareUrl) => {
 		navigator.clipboard.writeText(shareUrl).then(
 			() => {
-				setNotification("Share URL copied to clipboard!");
+				setNotification({
+					message: "Share URL copied to clipboard!",
+					type: "success",
+				});
 				setTimeout(() => setNotification(null), 3000);
 			},
 			(err) => {
@@ -123,7 +129,7 @@ function GeneratorPage() {
 
 	return (
 		<div className="App">
-			<Notification message={notification} />
+			<Notification message={notification?.message} type={notification?.type} />
 			<PageHeader title="Bingo Generator" />
 			<div className="input-section">
 				<h2 style={{ margin: 0 }}>Add Bingo Items</h2>

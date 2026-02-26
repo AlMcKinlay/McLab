@@ -6,7 +6,8 @@ const NotificationContainer = styled.div`
 	top: 2rem;
 	left: 50%;
 	transform: translateX(-50%);
-	background-color: var(--color-success);
+	background-color: ${(props) =>
+		props.$isError ? "var(--color-danger)" : "var(--color-success)"};
 	color: var(--text-contrast);
 	padding: 1rem 1.5rem;
 	border-radius: 8px;
@@ -15,9 +16,13 @@ const NotificationContainer = styled.div`
 	animation: slideDown 0.3s ease-out;
 `;
 
-function Notification({ message }) {
+function Notification({ message, type = "success" }) {
 	if (!message) return null;
-	return <NotificationContainer>{message}</NotificationContainer>;
+	return (
+		<NotificationContainer $isError={type === "error"}>
+			{message}
+		</NotificationContainer>
+	);
 }
 
 export default Notification;
