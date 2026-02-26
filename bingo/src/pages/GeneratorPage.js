@@ -30,6 +30,7 @@ function GeneratorPage() {
 	const [args, setArgs] = useState("");
 	const [name, setName] = useState("");
 	const [quantity, setQuantity] = useState(1);
+	const [freeSpaceText, setFreeSpaceText] = useState("Free space");
 	const [boards, setBoards] = useState([]);
 	const [editingId, setEditingId] = useState(null);
 	const [editingName, setEditingName] = useState("");
@@ -77,6 +78,7 @@ function GeneratorPage() {
 				id: boardId,
 				name: boardName,
 				items: items.slice(0, 24),
+				freeSpaceText: freeSpaceText.trim() || "Free space",
 				createdAt: new Date().toISOString(),
 				shareUrl: createShareUrl(items.slice(0, 24), boardName),
 			};
@@ -183,6 +185,29 @@ function GeneratorPage() {
 							onChange={(event) =>
 								setQuantity(Math.max(1, parseInt(event.target.value) || 1))
 							}
+							style={{ width: "100%" }}
+						/>
+					</div>
+				</div>
+				<div style={{ display: "flex", gap: "1rem" }}>
+					<div style={{ flex: 1 }}>
+						<label
+							htmlFor="free-space"
+							style={{
+								display: "block",
+								marginBottom: "0.5rem",
+								fontWeight: "600",
+							}}
+						>
+							Free Space Text:
+						</label>
+						<input
+							id="free-space"
+							type="text"
+							className="game-input"
+							value={freeSpaceText}
+							onChange={(event) => setFreeSpaceText(event.target.value)}
+							placeholder="Free space"
 							style={{ width: "100%" }}
 						/>
 					</div>
