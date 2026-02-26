@@ -28,7 +28,7 @@ const randomiseArgs = (argsToRandomise) => {
 
 function GeneratorPage() {
 	const [args, setArgs] = useState("");
-	const [name, setName] = useState("Board");
+	const [name, setName] = useState("");
 	const [boards, setBoards] = useState([]);
 	const [editingId, setEditingId] = useState(null);
 	const [editingName, setEditingName] = useState("");
@@ -132,7 +132,7 @@ function GeneratorPage() {
 			<Notification message={notification?.message} type={notification?.type} />
 			<PageHeader title="Bingo Generator" />
 			<div className="input-section">
-				<h2 style={{ margin: 0 }}>Add Bingo Items</h2>
+				<h2 style={{ margin: 0 }}>Create Bingo Boards</h2>
 				<div>
 					<label
 						htmlFor="board-name"
