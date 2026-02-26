@@ -56,7 +56,14 @@ const Completed = styled.div`
 	border-color: var(--color-success-hover) !important;
 `;
 
-function Bingo({ args, completed, complete, clearChecked, needMore }) {
+function Board({
+	args,
+	completed,
+	complete,
+	clearChecked,
+	needMore,
+	onCreateNew,
+}) {
 	let entries = [];
 	if (args.length >= 24) {
 		entries = args.slice(0, 24);
@@ -77,13 +84,31 @@ function Bingo({ args, completed, complete, clearChecked, needMore }) {
 							),
 						)}
 					</BingoCard>
-					<button
-						className="btn btn-secondary"
-						onClick={clearChecked}
-						style={{ marginTop: "1rem" }}
+					<div
+						style={{
+							display: "flex",
+							gap: "0.5rem",
+							marginTop: "1rem",
+							width: "100%",
+						}}
 					>
-						Clear Checked
-					</button>
+						<button
+							className="btn btn-secondary"
+							onClick={clearChecked}
+							style={{ flex: 1 }}
+						>
+							Clear Checked
+						</button>
+						{onCreateNew && (
+							<a
+								href={onCreateNew}
+								className="btn btn-secondary"
+								style={{ flex: 1, textDecoration: "none", textAlign: "center" }}
+							>
+								Create New Board
+							</a>
+						)}
+					</div>
 				</>
 			) : (
 				<BingoPlaceholder>
@@ -98,4 +123,4 @@ function Bingo({ args, completed, complete, clearChecked, needMore }) {
 	);
 }
 
-export default Bingo;
+export default Board;

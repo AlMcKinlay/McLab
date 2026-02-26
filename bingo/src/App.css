@@ -39,14 +39,12 @@ body {
 
 .App-header {
 	background: transparent;
-	display: grid;
-	grid-template-columns: 1fr 1fr;
-	gap: 2rem;
-	padding: 2rem;
-	flex: 1;
-	align-items: center;
-	justify-content: center;
-	color: var(--text-primary);
+	padding: 2rem 1rem;
+	border-bottom: 1px solid var(--border-primary);
+	font-size: 2.5rem;
+	font-weight: 600;
+	color: var(--text-heading);
+	letter-spacing: 1px;
 }
 
 /* Bingo Card Section */
@@ -75,6 +73,9 @@ body {
 	flex-direction: column;
 	gap: 1.5rem;
 	justify-content: center;
+	max-width: 600px;
+	margin: 2rem auto;
+	width: 100%;
 }
 
 .input-section textarea {
