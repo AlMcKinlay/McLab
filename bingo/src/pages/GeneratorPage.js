@@ -161,7 +161,7 @@ function GeneratorPage() {
 						style={{ width: "100%" }}
 					/>
 				</div>
-				<div style={{ display: "flex", gap: "1rem", marginTop: "1rem" }}>
+				<div style={{ display: "flex", gap: "1rem" }}>
 					<div style={{ flex: 1 }}>
 						<label
 							htmlFor="quantity"
