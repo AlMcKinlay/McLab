@@ -45,8 +45,7 @@ function GeneratorPage() {
 	}, [boards]);
 
 	const handleGenerateBoard = () => {
-		const items = randomiseArgs(args);
-		if (items.length < 24) {
+		if (args.split("\n").filter((line) => line.trim() !== "").length < 24) {
 			setNotification({
 				message: "You need at least 24 items to generate a bingo board",
 				type: "error",
@@ -74,6 +73,7 @@ function GeneratorPage() {
 			const boardName = `${baseName} ${nextNumber}`;
 
 			const boardId = generateBoardId();
+			const items = randomiseArgs(args);
 			const newBoard = {
 				id: boardId,
 				name: boardName,
