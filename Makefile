@@ -16,6 +16,11 @@ buildPokemonList:
 	npm i && \
 	npm run build
 
+buildPokemonDexSort:
+	cd pokemon-dex-sort && \
+	npm i && \
+	npm run build
+
 buildSwitch:
 	cd switch && \
 	npm i && \
@@ -32,12 +37,13 @@ copyBuilds:
 	mkdir -p build
 	mv bingo/build build/bingo
 	mv pokemon-list/build build/pokemon-list
+	mv pokemon-dex-sort/build build/pokemon-dex-sort
 	mv switch/build build/switch
 	mv game-draft/build build/game-draft
 	cp homepage/* build/
 	cp shared/theme-variables.css build/
 
-build: npm_install buildBingo buildFunctions buildPokemonList buildSwitch buildGameDraft copyBuilds
+build: npm_install buildBingo buildFunctions buildPokemonList buildPokemonDexSort buildSwitch buildGameDraft copyBuilds
 
 npm_install:
 	npm install

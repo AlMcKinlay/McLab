@@ -78,6 +78,14 @@ const apps = [
 		thumbnail: "./pokemon-thumbnail.png",
 	},
 	{
+		id: "pokemon-dex-sort",
+		title: "Pokemon Dex Sort",
+		description: "Sort newline Pokemon names by National Dex order",
+		url: "/pokemon-dex-sort",
+		thumbnail: "./pokemon-dex-sort-thumbnail.png",
+		thumbnailFallback: true,
+	},
+	{
 		id: "bingo",
 		title: "Bingo",
 		description: "Create randomly generated bingo card from input",
