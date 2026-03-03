@@ -62,56 +62,26 @@ export const fetchMetacriticScore = async (gameName) => {
 
 		console.log(`Searching for: "${gameName}"`);
 
-		// Look for all game result cards - try multiple selector strategies
-		let resultCards = doc.querySelectorAll(
-			'[class*="search-result"], [class*="product_item"], [class*="c-finderProductCard"], [class*="c-productCard"], .search_result',
-		);
-
-		// If no result cards found, try looking for any links to game pages
-		if (resultCards.length === 0) {
-			console.log(`No result cards found, trying alternative selectors`);
-			const gameLinks = doc.querySelectorAll('a[href*="/game/"]');
-			console.log(`Found ${gameLinks.length} game links`);
-
-			// For each game link, find its parent container
-			resultCards = Array.from(gameLinks).map((link) => {
-				// Walk up the DOM to find a likely container
-				let parent = link.parentElement;
-				let depth = 0;
-				while (parent && depth < 5) {
-					if (parent.classList.length > 0) {
-						return parent;
-					}
-					parent = parent.parentElement;
-					depth++;
-				}
-				return link;
-			});
+		// Find the search results container
+		const resultsContainer = doc.querySelector(".c-pageSiteSearch-results");
+		if (!resultsContainer) {
+			console.log("Results container not found");
+			return { score: null, isTbd: false };
 		}
 
-		console.log(`Found ${resultCards.length} result cards to check`);
+		// Look for game links within the results container
+		const gameLinks = resultsContainer.querySelectorAll('a[href*="/game/"]');
+		console.log(`Found ${gameLinks.length} game links to check`);
 
-		// Check each result card to find a matching title
-		for (let i = 0; i < resultCards.length; i++) {
-			const resultCard = resultCards[i];
+		if (gameLinks.length === 0) {
+			console.log("No game links found in results");
+			return { score: null, isTbd: false };
+		}
 
-			// Try multiple ways to extract the title
-			let foundTitle = null;
-
-			// Method 1: Look for title elements within this card
-			const titleElement = resultCard.querySelector(
-				'h3, h2, h1, [class*="title"], [class*="productTitle"], [class*="name"], [class*="productName"]',
-			);
-
-			if (titleElement) {
-				foundTitle = titleElement.textContent.trim();
-			} else {
-				// Method 2: Look for link text
-				const linkElement = resultCard.querySelector('a[href*="/game/"]');
-				if (linkElement) {
-					foundTitle = linkElement.textContent.trim();
-				}
-			}
+		// Check each game link to find a matching title
+		for (let i = 0; i < gameLinks.length; i++) {
+			const gameLink = gameLinks[i];
+			const foundTitle = gameLink.textContent.trim();
 
 			if (foundTitle) {
 				console.log(`Result ${i + 1}: "${foundTitle}"`);
@@ -119,27 +89,66 @@ export const fetchMetacriticScore = async (gameName) => {
 				// Check if this game matches what we searched for
 				if (namesMatch(gameName, foundTitle)) {
 					foundMatchingGame = true;
-					matchingResultCard = resultCard;
+					// Get the closest parent card/container
+					matchingResultCard = gameLink.closest(
+						'[class*="c-productCard"], [class*="product_item"], [class*="search-result"], div',
+					);
 					console.log(`✓ Match found at position ${i + 1}: "${foundTitle}"`);
 					break; // Found a match, stop looking
 				}
-			} else {
-				console.log(`Result ${i + 1}: Could not extract title`);
 			}
 		}
 
 		if (!foundMatchingGame) {
-			console.log(`No matching game found in ${resultCards.length} results`);
+			console.log(`No matching game found in ${gameLinks.length} results`);
 		}
 
-		// Look for metascore in various formats
-		const scoreElement = matchingResultCard
-			? matchingResultCard.querySelector(
-					'.c-siteReviewScore, .metascore_w, [class*="metascore"], [class*="score"]',
-				)
-			: doc.querySelector(
-					'.c-siteReviewScore, .metascore_w, [class*="metascore"], [class*="score"]',
+		// Look for score in the matching result card with broader selectors
+		let scoreElement = null;
+
+		if (matchingResultCard) {
+			console.log(`Searching for score in matching card...`);
+			// Try multiple selector strategies to find the score
+			const scoreSelectors = [
+				".c-siteReviewScore",
+				'[class*="metascore"]',
+				'[class*="score"]',
+				'[data-type="metascore"]',
+				'div[class*="rating"]',
+				'span[class*="score"]',
+				'div[data-testid="product-metascore"]',
+			];
+
+			for (const selector of scoreSelectors) {
+				scoreElement = matchingResultCard.querySelector(selector);
+				if (scoreElement) {
+					console.log(`Found score element with selector: ${selector}`);
+					break;
+				}
+			}
+
+			// If still not found, log the HTML structure for debugging
+			if (!scoreElement) {
+				console.log(
+					`No score element found. Card structure:`,
+					matchingResultCard.innerHTML.substring(0, 500),
 				);
+
+				// Try searching for any element containing just numbers or "tbd"
+				const allElements = matchingResultCard.querySelectorAll("*");
+				for (const el of allElements) {
+					const text = el.textContent.trim().toLowerCase();
+					// Match just numbers (score) or "tbd"
+					if (/^(\d+|tbd)$/.test(text) && text.length <= 3) {
+						scoreElement = el;
+						console.log(
+							`Found potential score element by text content: "${text}"`,
+						);
+						break;
+					}
+				}
+			}
+		}
 
 		console.log(`Found score element:`, scoreElement ? "yes" : "no");
 
@@ -154,30 +163,8 @@ export const fetchMetacriticScore = async (gameName) => {
 			} else {
 				const parsedScore = parseInt(scoreText, 10);
 				if (!isNaN(parsedScore)) {
-					// Only return a numeric score if we verified the game title matches
-					if (!foundMatchingGame) {
-						console.log(`Found score but no title match - rejecting`);
-						return { score: null, isTbd: false };
-					}
 					score = parsedScore;
-				}
-			}
-		}
-
-		// Try to find score in JSON-LD data (only if we haven't found a score or TBD yet)
-		if (score === null && !isTbd) {
-			const scriptTags = doc.querySelectorAll(
-				'script[type="application/ld+json"]',
-			);
-			for (const script of scriptTags) {
-				try {
-					const data = JSON.parse(script.textContent);
-					if (data.aggregateRating?.ratingValue) {
-						score = Math.round(data.aggregateRating.ratingValue);
-						break;
-					}
-				} catch (e) {
-					// Continue to next script tag
+					console.log(`✓ Score found: ${score}`);
 				}
 			}
 		}
