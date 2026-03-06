@@ -3,7 +3,7 @@ import { useEffect, useRef } from "react";
 // Cache for preloaded images
 const imageCache = new Map();
 
-function PokemonCard({ id, name, isSelected }) {
+function PokemonCard({ id, name, isSelected, displayNumber }) {
 	const imgRef = useRef(null);
 
 	useEffect(() => {
@@ -33,7 +33,7 @@ function PokemonCard({ id, name, isSelected }) {
 			{isSelected && <div className="pokemon-card-check">✓</div>}
 			<img ref={imgRef} alt={`Sprite for ${name}`} loading="lazy" />
 			<br />
-			{name} ({id})
+			{name} ({displayNumber ?? id})
 		</div>
 	);
 }
