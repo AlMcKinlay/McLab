@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 
 export const useSelected = () => {
 	const [selected, setSelected] = useState([]);
@@ -43,5 +43,33 @@ export const useSelected = () => {
 		setSelected(merged);
 	};
 
-	return [selected, selectPokemon, unselectPokemon, clear, selectManyPokemon];
+	const replaceSelectedPokemon = useCallback((pokemonList) => {
+		if (!Array.isArray(pokemonList) || pokemonList.length === 0) {
+			setSelected([]);
+			return;
+		}
+
+		const deduped = [];
+		const seenIds = new Set();
+
+		pokemonList.forEach((pokemon) => {
+			const id = pokemon.url.split("/").slice(-2)[0];
+			if (!seenIds.has(id)) {
+				seenIds.add(id);
+				deduped.push({ ...pokemon, id });
+			}
+		});
+
+		deduped.sort((a, b) => Number(a.id) - Number(b.id));
+		setSelected(deduped);
+	}, []);
+
+	return [
+		selected,
+		selectPokemon,
+		unselectPokemon,
+		clear,
+		selectManyPokemon,
+		replaceSelectedPokemon,
+	];
 };

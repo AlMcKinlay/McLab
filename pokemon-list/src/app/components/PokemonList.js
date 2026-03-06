@@ -3,6 +3,7 @@ import {
 	getAllPokemon,
 	getPokedex,
 	getPokemonDetails,
+	getTypeDetails,
 	getVersion,
 	getVersionGroup,
 } from "../api/getPokemon";
@@ -10,20 +11,11 @@ import PokemonCard from "./PokemonCard";
 
 const DLC_SEPARATOR = "__with_dlc__";
 
-const getGenerationFromId = (id) => {
-	const numericId = Number(id);
-	if (numericId <= 151) return "1";
-	if (numericId <= 251) return "2";
-	if (numericId <= 386) return "3";
-	if (numericId <= 493) return "4";
-	if (numericId <= 649) return "5";
-	if (numericId <= 721) return "6";
-	if (numericId <= 809) return "7";
-	if (numericId <= 905) return "8";
-	return "9";
-};
-
-const resolveSpeciesNameFromDexGroups = (pokemonName, dexGroups) => {
+const resolveSpeciesNameFromDexGroups = (
+	pokemonName,
+	dexGroups,
+	speciesNameMap,
+) => {
 	if (!dexGroups || dexGroups.length === 0) {
 		return pokemonName;
 	}
@@ -35,12 +27,9 @@ const resolveSpeciesNameFromDexGroups = (pokemonName, dexGroups) => {
 		return pokemonName;
 	}
 
-	const parts = pokemonName.split("-");
-	for (let i = parts.length - 1; i > 0; i -= 1) {
-		const candidate = parts.slice(0, i).join("-");
-		if (hasSpecies(candidate)) {
-			return candidate;
-		}
+	const resolvedSpeciesName = speciesNameMap?.get(pokemonName);
+	if (resolvedSpeciesName && hasSpecies(resolvedSpeciesName)) {
+		return resolvedSpeciesName;
 	}
 
 	return pokemonName;
@@ -61,17 +50,20 @@ const parseSelectedVersions = (selectedGame) => {
 function PokemonList({
 	filter,
 	selectPokemon,
-	getGetTop,
-	getGetFiltered,
-	getGetAll,
+	onTopPokemonChange,
+	onFilteredListChange,
+	onAllPokemonChange,
 	onRegionalDexMapChange,
 	selected,
+	showList = true,
 }) {
 	const [list, setList] = useState([]);
-	const [pokemonDetailsMap, setPokemonDetailsMap] = useState(new Map());
+	const [typePokemonMap, setTypePokemonMap] = useState(new Map());
+	const [speciesNameMap, setSpeciesNameMap] = useState(new Map());
 	const [gameDexCache, setGameDexCache] = useState(new Map());
 	const [activeGameDex, setActiveGameDex] = useState(null);
 	const [regionalPokemonMap, setRegionalPokemonMap] = useState(new Map());
+	const isGameDexReady = !filter.game || gameDexCache.has(filter.game);
 
 	useEffect(() => {
 		getAllPokemon().then((res) => setList(res.results));
@@ -87,6 +79,8 @@ function PokemonList({
 			setActiveGameDex(gameDexCache.get(filter.game));
 			return;
 		}
+
+		setActiveGameDex(null);
 
 		let cancelled = false;
 		const selectedVersions = parseSelectedVersions(filter.game);
@@ -174,36 +168,73 @@ function PokemonList({
 	}, [filter.game, gameDexCache]);
 
 	useEffect(() => {
-		onRegionalDexMapChange(regionalPokemonMap);
+		if (onRegionalDexMapChange) {
+			onRegionalDexMapChange(regionalPokemonMap);
+		}
 	}, [regionalPokemonMap, onRegionalDexMapChange]);
 
-	// Fetch details for visible pokemon as needed when type filtering is active
+	// Fetch type memberships once per selected type and cache in-memory
 	useEffect(() => {
-		const shouldFetchDetails = filter.types && filter.types.length > 0;
+		const selectedTypes = filter.types || [];
+		if (selectedTypes.length === 0) {
+			return;
+		}
 
-		if (!shouldFetchDetails) return;
-
-		const visiblePokemon = list.filter((pokemon) =>
-			pokemon.name.toLowerCase().includes(filter.name.toLowerCase()),
-		);
-
-		visiblePokemon.forEach((pokemon) => {
-			if (!pokemonDetailsMap.has(pokemon.name)) {
-				getPokemonDetails(pokemon.url).then((details) => {
-					setPokemonDetailsMap((prev) => {
-						const newMap = new Map(prev);
-						newMap.set(pokemon.name, {
-							types: details.types.map((t) => t.type.name),
-						});
-						return newMap;
-					});
-				});
+		selectedTypes.forEach((typeName) => {
+			if (typePokemonMap.has(typeName)) {
+				return;
 			}
+
+			getTypeDetails(typeName).then((typeDetails) => {
+				setTypePokemonMap((prev) => {
+					if (prev.has(typeName)) {
+						return prev;
+					}
+
+					const names = new Set(
+						(typeDetails.pokemon || []).map((entry) => entry.pokemon.name),
+					);
+					const next = new Map(prev);
+					next.set(typeName, names);
+					return next;
+				});
+			});
 		});
-	}, [list, filter.name, filter.types, pokemonDetailsMap]);
+	}, [filter.types, typePokemonMap]);
 
 	useEffect(() => {
-		if (!activeGameDex || !filter.game) {
+		if (!filter.game || !isGameDexReady || !activeGameDex) {
+			return;
+		}
+
+		const hasSpeciesInDex = (name) =>
+			activeGameDex.groups.some((group) => group.entries.has(name));
+
+		const candidates = list.filter((pokemon) => {
+			return (
+				pokemon.name.includes("-") &&
+				!hasSpeciesInDex(pokemon.name) &&
+				!speciesNameMap.has(pokemon.name)
+			);
+		});
+
+		candidates.forEach((pokemon) => {
+			getPokemonDetails(pokemon.url).then((details) => {
+				setSpeciesNameMap((prev) => {
+					if (prev.has(pokemon.name)) {
+						return prev;
+					}
+
+					const next = new Map(prev);
+					next.set(pokemon.name, details.species?.name || pokemon.name);
+					return next;
+				});
+			});
+		});
+	}, [filter.game, isGameDexReady, activeGameDex, list, speciesNameMap]);
+
+	useEffect(() => {
+		if (!activeGameDex || !filter.game || !isGameDexReady) {
 			setRegionalPokemonMap(new Map());
 			return;
 		}
@@ -213,6 +244,7 @@ function PokemonList({
 			const speciesName = resolveSpeciesNameFromDexGroups(
 				pokemon.name,
 				activeGameDex.groups,
+				speciesNameMap,
 			);
 			const regionalEntry = activeGameDex.lookup.get(speciesName);
 			if (regionalEntry) {
@@ -220,42 +252,36 @@ function PokemonList({
 			}
 		});
 		setRegionalPokemonMap(map);
-	}, [activeGameDex, filter.game, list]);
+	}, [activeGameDex, filter.game, isGameDexReady, list, speciesNameMap]);
 
 	const filteredList = list.filter((pokemon) => {
-		const pokemonId = pokemon.url.split("/").slice(-2)[0];
-
 		// Filter by name
 		if (!pokemon.name.toLowerCase().includes(filter.name.toLowerCase())) {
 			return false;
 		}
 
-		// Filter by generation
-		if (
-			filter.generation &&
-			filter.generation !== "all" &&
-			getGenerationFromId(pokemonId) !== filter.generation
-		) {
-			return false;
-		}
-
 		// Filter by types if any are selected (exclusive - must match ALL selected types)
 		if (filter.types && filter.types.length > 0) {
-			const pokemonTypes = pokemonDetailsMap.get(pokemon.name)?.types;
-			if (!pokemonTypes) return false; // Still loading
-			if (
-				!filter.types.every((filterType) => pokemonTypes.includes(filterType))
-			) {
+			const hasAllTypes = filter.types.every((filterType) => {
+				const typeSet = typePokemonMap.get(filterType);
+				if (!typeSet) {
+					return false;
+				}
+				return typeSet.has(pokemon.name);
+			});
+
+			if (!hasAllTypes) {
 				return false;
 			}
 		}
 
 		// Filter by game when selected
 		if (filter.game) {
-			if (!activeGameDex) return false; // Still loading dex
+			if (!isGameDexReady || !activeGameDex) return false; // Still loading dex
 			const speciesName = resolveSpeciesNameFromDexGroups(
 				pokemon.name,
 				activeGameDex.groups,
+				speciesNameMap,
 			);
 			if (!activeGameDex.lookup.has(speciesName)) {
 				return false;
@@ -265,9 +291,40 @@ function PokemonList({
 		return true;
 	});
 
-	getGetTop(() => filteredList[0]);
-	getGetFiltered(() => filteredList);
-	getGetAll(() => list);
+	useEffect(() => {
+		if (onTopPokemonChange) {
+			onTopPokemonChange(filteredList[0] || null);
+		}
+	}, [filteredList, onTopPokemonChange]);
+
+	useEffect(() => {
+		if (onFilteredListChange) {
+			const gameReady =
+				!filter.game || (isGameDexReady && Boolean(activeGameDex));
+			onFilteredListChange(filteredList, {
+				game: filter.game || "",
+				name: filter.name || "",
+				gameReady,
+			});
+		}
+	}, [
+		filteredList,
+		onFilteredListChange,
+		filter.game,
+		filter.name,
+		activeGameDex,
+		isGameDexReady,
+	]);
+
+	useEffect(() => {
+		if (onAllPokemonChange) {
+			onAllPokemonChange(list);
+		}
+	}, [list, onAllPokemonChange]);
+
+	if (!showList) {
+		return null;
+	}
 
 	return (
 		<ul className="pokemon-list">

@@ -18,6 +18,12 @@ export const getAllTypes = () => {
 	return fetch("https://pokeapi.co/api/v2/type").then((res) => res.json());
 };
 
+export const getTypeDetails = (typeName) => {
+	return fetch(`https://pokeapi.co/api/v2/type/${typeName}`).then((res) =>
+		res.json(),
+	);
+};
+
 export const getAllVersions = () => {
 	return fetch("https://pokeapi.co/api/v2/version?limit=200").then((res) =>
 		res.json(),

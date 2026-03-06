@@ -35,6 +35,12 @@ const DLC_ONLY_VERSIONS = new Set(
 	GAME_DLC_COMBINATIONS.flatMap((entry) => entry.dlcVersions),
 );
 
+const JAPAN_SPECIFIC_VERSIONS = new Set([
+	"red-japan",
+	"green-japan",
+	"blue-japan",
+]);
+
 const formatGameName = (game) =>
 	game
 		.split("-")
@@ -54,7 +60,15 @@ const getVersionIdFromUrl = (url) => {
 	return match ? Number(match[1]) : -1;
 };
 
-function Filter({ filter, setFilter, selectTop, selectAllVisible }) {
+function Filter({
+	mode,
+	filter,
+	setFilter,
+	gameFilter,
+	setGameFilter,
+	selectTop,
+	selectAllVisible,
+}) {
 	const [types, setTypes] = useState([]);
 	const [gameOptions, setGameOptions] = useState([]);
 
@@ -78,7 +92,10 @@ function Filter({ filter, setFilter, selectTop, selectAllVisible }) {
 
 			const options = [];
 			sortedVersions.forEach((version) => {
-				if (DLC_ONLY_VERSIONS.has(version.name)) {
+				if (
+					DLC_ONLY_VERSIONS.has(version.name) ||
+					JAPAN_SPECIFIC_VERSIONS.has(version.name)
+				) {
 					return;
 				}
 
@@ -118,6 +135,26 @@ function Filter({ filter, setFilter, selectTop, selectAllVisible }) {
 		setFilter({ ...filter, types: newTypes });
 	};
 
+	if (mode === "game") {
+		return (
+			<div className="filter-control">
+				<label>Game:</label>
+				<select
+					className="game-input"
+					value={gameFilter?.game || ""}
+					onChange={(event) => setGameFilter({ game: event.target.value })}
+				>
+					<option value="">Select a game</option>
+					{gameOptions.map((option) => (
+						<option key={option.value} value={option.value}>
+							{option.label}
+						</option>
+					))}
+				</select>
+			</div>
+		);
+	}
+
 	return (
 		<>
 			<div className="filter-actions">
@@ -132,46 +169,6 @@ function Filter({ filter, setFilter, selectTop, selectAllVisible }) {
 				onKeyDown={_handleKeyDown}
 				onChange={(event) => setFilter({ ...filter, name: event.target.value })}
 			/>
-			<div className="filter-row">
-				<div className="filter-control">
-					<label>Generation:</label>
-					<select
-						className="game-input"
-						value={filter.generation || "all"}
-						onChange={(event) =>
-							setFilter({ ...filter, generation: event.target.value })
-						}
-					>
-						<option value="all">All generations</option>
-						<option value="1">Gen 1</option>
-						<option value="2">Gen 2</option>
-						<option value="3">Gen 3</option>
-						<option value="4">Gen 4</option>
-						<option value="5">Gen 5</option>
-						<option value="6">Gen 6</option>
-						<option value="7">Gen 7</option>
-						<option value="8">Gen 8</option>
-						<option value="9">Gen 9</option>
-					</select>
-				</div>
-				<div className="filter-control">
-					<label>Game:</label>
-					<select
-						className="game-input"
-						value={filter.game || ""}
-						onChange={(event) =>
-							setFilter({ ...filter, game: event.target.value })
-						}
-					>
-						<option value="">All games</option>
-						{gameOptions.map((option) => (
-							<option key={option.value} value={option.value}>
-								{option.label}
-							</option>
-						))}
-					</select>
-				</div>
-			</div>
 			<div className="type-filter">
 				<label
 					style={{

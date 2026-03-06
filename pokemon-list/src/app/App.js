@@ -8,12 +8,19 @@ import OutputSettings from "./components/OutputSettings";
 import { initializeTheme } from "shared-utils";
 
 function App() {
-	const [selected, selectPokemon, unselectPokemon, clear, selectManyPokemon] =
-		useSelected();
+	const [
+		selected,
+		selectPokemon,
+		unselectPokemon,
+		clear,
+		selectManyPokemon,
+		replaceSelectedPokemon,
+	] = useSelected();
 	const [groupByBox, setGroupByBox] = useState(true);
 	const [sortMode, setSortMode] = useState("national");
 	const [selectedGame, setSelectedGame] = useState("");
 	const [regionalDexMap, setRegionalDexMap] = useState(new Map());
+	const [isGameLoading, setIsGameLoading] = useState(false);
 
 	const sortedSelected = [...selected].sort((a, b) => {
 		if (sortMode === "regional" && selectedGame) {
@@ -77,11 +84,13 @@ function App() {
 				<SelectionList
 					selectPokemon={selectPokemon}
 					selectManyPokemon={selectManyPokemon}
+					replaceSelectedPokemon={replaceSelectedPokemon}
 					selected={selected}
 					onGameChange={setSelectedGame}
 					onRegionalDexMapChange={setRegionalDexMap}
+					onGameLoadingChange={setIsGameLoading}
 				></SelectionList>
-				<div className="list">
+				<div className="list output-panel">
 					<OutputSettings
 						clear={clear}
 						selected={sortedSelected}
@@ -92,13 +101,21 @@ function App() {
 						hasRegionalDex={Boolean(selectedGame)}
 						regionalDexMap={regionalDexMap}
 					></OutputSettings>
-					<OutputList
-						selected={sortedSelected}
-						groupByBox={groupByBox}
-						unselectPokemon={unselectPokemon}
-						sortMode={sortMode}
-						regionalDexMap={regionalDexMap}
-					></OutputList>
+					<div className="output-content-wrap">
+						<OutputList
+							selected={sortedSelected}
+							groupByBox={groupByBox}
+							unselectPokemon={unselectPokemon}
+							sortMode={sortMode}
+							regionalDexMap={regionalDexMap}
+						></OutputList>
+					</div>
+					{isGameLoading ? (
+						<div className="output-loading-overlay" aria-live="polite">
+							<span className="spinner" aria-hidden="true" />
+							Loading game dex…
+						</div>
+					) : null}
 				</div>
 			</main>
 		</div>
