@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 const formatDexName = (dexName) =>
 	(dexName || "regional-dex")
 		.split("-")
@@ -13,6 +15,8 @@ const formatDexName = (dexName) =>
 function OutputSettings({
 	clear,
 	selected,
+	onSaveList,
+	defaultSaveName,
 	groupByBox,
 	onToggleGroupByBox,
 	sortMode,
@@ -20,6 +24,24 @@ function OutputSettings({
 	hasRegionalDex,
 	regionalDexMap,
 }) {
+	const [isNamingList, setIsNamingList] = useState(false);
+	const [listNameDraft, setListNameDraft] = useState(defaultSaveName || "");
+
+	const startNamingList = () => {
+		setListNameDraft(defaultSaveName || "");
+		setIsNamingList(true);
+	};
+
+	const cancelNamingList = () => {
+		setIsNamingList(false);
+		setListNameDraft(defaultSaveName || "");
+	};
+
+	const saveListWithName = () => {
+		onSaveList(listNameDraft);
+		setIsNamingList(false);
+	};
+
 	const getDisplayNumber = (pokemon) => {
 		if (sortMode === "regional") {
 			const regionalEntry = regionalDexMap.get(pokemon.name);
@@ -144,6 +166,41 @@ function OutputSettings({
 			<button className="btn btn-secondary" onClick={copyToClipboard}>
 				Copy
 			</button>
+			{isNamingList ? (
+				<div className="saved-inline-edit">
+					<input
+						type="text"
+						className="game-input"
+						value={listNameDraft}
+						onChange={(event) => setListNameDraft(event.target.value)}
+						onKeyDown={(event) => {
+							if (event.key === "Enter") {
+								saveListWithName();
+							}
+							if (event.key === "Escape") {
+								cancelNamingList();
+							}
+						}}
+						autoFocus
+					/>
+					<div className="saved-list-actions">
+						<button className="btn btn-primary" onClick={saveListWithName}>
+							Save
+						</button>
+						<button className="btn btn-secondary" onClick={cancelNamingList}>
+							Cancel
+						</button>
+					</div>
+				</div>
+			) : (
+				<button
+					className="btn btn-secondary"
+					onClick={startNamingList}
+					disabled={selected.length === 0}
+				>
+					Save List
+				</button>
+			)}
 		</>
 	);
 }
