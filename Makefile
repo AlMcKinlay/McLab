@@ -37,6 +37,11 @@ buildTicTacToe:
 	npm i && \
 	npm run build
 
+buildRanker:
+	cd ranker && \
+	npm i && \
+	npm run build
+
 copyBuilds:
 	rm -rf build
 	mkdir -p build
@@ -46,6 +51,7 @@ copyBuilds:
 	mv switch/build build/switch
 	mv game-draft/build build/game-draft
 	mv tic-tac-toe/build build/tic-tac-toe
+	mv ranker/build build/ranker
 	cp homepage/* build/
 	cp shared/theme-variables.css build/
 

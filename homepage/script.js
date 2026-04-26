@@ -100,6 +100,14 @@ const apps = [
 		thumbnail: "./tic-tac-toe-thumbnail.png",
 		thumbnailFallback: true,
 	},
+	{
+		id: "ranker",
+		title: "Ranker",
+		description: "Compare items pairwise to create a complete ranking",
+		url: "/ranker",
+		thumbnail: "./ranker-thumbnail.png",
+		thumbnailFallback: true,
+	},
 ];
 
 // DOM Elements
