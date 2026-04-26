@@ -32,6 +32,11 @@ buildGameDraft:
 	npm run build && \
 	cd ..
 
+buildTicTacToe:
+	cd tic-tac-toe && \
+	npm i && \
+	npm run build
+
 copyBuilds:
 	rm -rf build
 	mkdir -p build
@@ -40,10 +45,11 @@ copyBuilds:
 	mv pokemon-dex-sort/build build/pokemon-dex-sort
 	mv switch/build build/switch
 	mv game-draft/build build/game-draft
+	mv tic-tac-toe/build build/tic-tac-toe
 	cp homepage/* build/
 	cp shared/theme-variables.css build/
 
-build: npm_install buildBingo buildFunctions buildPokemonList buildPokemonDexSort buildSwitch buildGameDraft copyBuilds
+build: npm_install buildBingo buildFunctions buildPokemonList buildPokemonDexSort buildSwitch buildGameDraft buildTicTacToe copyBuilds
 
 npm_install:
 	npm install

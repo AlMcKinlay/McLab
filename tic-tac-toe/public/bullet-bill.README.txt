@@ -1,0 +1,10 @@
+Place your Bullet Bill image in this folder as:
+
+- bullet-bill.png
+
+The app references the image at /bullet-bill.png for both corner placement and projectile animation.
+
+Recommended image guidance:
+- Transparent PNG background
+- Landscape orientation (roughly 2:1)
+- Around 300x150 px or higher for crisp scaling
