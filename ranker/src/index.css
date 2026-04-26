@@ -4,7 +4,8 @@
 	box-sizing: border-box;
 }
 
-html {
+html,
+html[data-theme="light"] {
 	--text-primary: #111;
 	--text-secondary: #666;
 	--text-heading: #000;
@@ -26,7 +27,7 @@ html {
 	--shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
 }
 
-html.dark-mode {
+html[data-theme="dark"] {
 	--text-primary: #e8e8e8;
 	--text-secondary: #b0b0b0;
 	--text-heading: #fff;
