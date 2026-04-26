@@ -1,11 +1,16 @@
 import { useEffect, useMemo, useState } from "react";
 import "./App.css";
 
+const SAVED_RESULTS_KEY = "ranker.savedResults.v1";
+
 function App() {
 	const [items, setItems] = useState([]);
 	const [newItemInput, setNewItemInput] = useState("");
 	const [mode, setMode] = useState("input");
 	const [rankingSession, setRankingSession] = useState(null);
+	const [savedResults, setSavedResults] = useState([]);
+	const [viewedResult, setViewedResult] = useState(null);
+	const [hasHydratedSavedResults, setHasHydratedSavedResults] = useState(false);
 
 	const totalComparisons = useMemo(
 		() => (items.length * (items.length - 1)) / 2,
@@ -16,7 +21,12 @@ function App() {
 		return Object.fromEntries(items.map((item) => [item.id, item]));
 	}, [items]);
 
-	const createSession = (orderedIds, nextPendingIndex, manualComparisons) => {
+	const createSession = (
+		orderedIds,
+		nextPendingIndex,
+		manualComparisons,
+		savedResultId = null,
+	) => {
 		if (nextPendingIndex >= items.length) {
 			return {
 				orderedIds,
@@ -26,6 +36,7 @@ function App() {
 				high: 0,
 				compareIndex: -1,
 				manualComparisons,
+				savedResultId,
 				completed: true,
 			};
 		}
@@ -38,15 +49,70 @@ function App() {
 			high: orderedIds.length,
 			compareIndex: Math.floor(orderedIds.length / 2),
 			manualComparisons,
+			savedResultId,
 			completed: false,
 		};
 	};
+
+	useEffect(() => {
+		try {
+			const raw = localStorage.getItem(SAVED_RESULTS_KEY);
+			if (!raw) {
+				setHasHydratedSavedResults(true);
+				return;
+			}
+
+			const parsed = JSON.parse(raw);
+			if (Array.isArray(parsed)) {
+				setSavedResults(parsed);
+			}
+			setHasHydratedSavedResults(true);
+		} catch {
+			setSavedResults([]);
+			setHasHydratedSavedResults(true);
+		}
+	}, []);
+
+	useEffect(() => {
+		if (!hasHydratedSavedResults) {
+			return;
+		}
+
+		localStorage.setItem(SAVED_RESULTS_KEY, JSON.stringify(savedResults));
+	}, [savedResults, hasHydratedSavedResults]);
 
 	useEffect(() => {
 		if (mode === "comparing" && rankingSession?.completed) {
 			setMode("results");
 		}
 	}, [mode, rankingSession]);
+
+	const saveCompletedSession = (session) => {
+		if (!session?.completed || session.savedResultId) {
+			return session;
+		}
+
+		const rankedNames = (session.orderedIds || [])
+			.map((id) => itemsById[id]?.name)
+			.filter(Boolean);
+
+		if (rankedNames.length === 0) {
+			return session;
+		}
+
+		const savedId = `result-${Date.now()}`;
+		const resultRecord = {
+			id: savedId,
+			createdAt: new Date().toISOString(),
+			totalItems: rankedNames.length,
+			manualComparisons: session.manualComparisons,
+			totalComparisons,
+			items: rankedNames,
+		};
+
+		setSavedResults((prev) => [resultRecord, ...prev]);
+		return { ...session, savedResultId: savedId };
+	};
 
 	const rankedIds = useMemo(
 		() => rankingSession?.orderedIds ?? [],
@@ -107,6 +173,7 @@ function App() {
 		}
 
 		setRankingSession(createSession([items[0].id], 1, 0));
+		setViewedResult(null);
 		setMode("comparing");
 	};
 
@@ -127,14 +194,14 @@ function App() {
 		if (nextLow >= nextHigh) {
 			const nextOrderedIds = [...rankingSession.orderedIds];
 			nextOrderedIds.splice(nextLow, 0, rankingSession.insertionItemId);
-
-			setRankingSession(
-				createSession(
-					nextOrderedIds,
-					rankingSession.pendingIndex + 1,
-					nextManualComparisons,
-				),
+			const nextSession = createSession(
+				nextOrderedIds,
+				rankingSession.pendingIndex + 1,
+				nextManualComparisons,
+				rankingSession.savedResultId,
 			);
+
+			setRankingSession(saveCompletedSession(nextSession));
 			return;
 		}
 
@@ -152,11 +219,34 @@ function App() {
 		setNewItemInput("");
 		setMode("input");
 		setRankingSession(null);
+		setViewedResult(null);
+	};
+
+	const handleViewSaved = (result) => {
+		setViewedResult(result);
+		setMode("saved");
+	};
+
+	const handleDeleteSaved = (resultId) => {
+		setSavedResults((prev) => prev.filter((result) => result.id !== resultId));
+		if (viewedResult?.id === resultId) {
+			setViewedResult(null);
+			setMode("input");
+		}
 	};
 
 	const inferredComparisons = rankingSession
 		? totalComparisons - rankingSession.manualComparisons
 		: 0;
+
+	const formatSavedDate = (isoDate) => {
+		const date = new Date(isoDate);
+		if (Number.isNaN(date.getTime())) {
+			return "Unknown date";
+		}
+
+		return date.toLocaleString();
+	};
 
 	return (
 		<div className="ranker-app">
@@ -222,6 +312,40 @@ function App() {
 								Start Ranking (up to {totalComparisons} pairings)
 							</button>
 						)}
+
+						{savedResults.length > 0 && (
+							<div className="saved-results">
+								<h3>Saved Rankings ({savedResults.length})</h3>
+								<ul className="saved-results-list">
+									{savedResults.map((result) => (
+										<li key={result.id} className="saved-result-row">
+											<div className="saved-result-info">
+												<div className="saved-result-title">
+													{result.items[0]} ({result.totalItems} items)
+												</div>
+												<div className="saved-result-meta">
+													{formatSavedDate(result.createdAt)}
+												</div>
+											</div>
+											<div className="saved-result-actions">
+												<button
+													onClick={() => handleViewSaved(result)}
+													className="ranker-button secondary small"
+												>
+													View
+												</button>
+												<button
+													onClick={() => handleDeleteSaved(result.id)}
+													className="ranker-button danger small"
+												>
+													Delete
+												</button>
+											</div>
+										</li>
+									))}
+								</ul>
+							</div>
+						)}
 					</div>
 				)}
 
@@ -280,6 +404,12 @@ function App() {
 						<p className="comparison-progress">
 							Skipped via ordering logic: {inferredComparisons}
 						</p>
+						<p className="comparison-progress">
+							Saved to history automatically
+						</p>
+						<p className="comparison-progress">
+							Saved rankings available: {savedResults.length}
+						</p>
 
 						<div className="rankings-list">
 							{rankings.map((ranking) => (
@@ -303,10 +433,54 @@ function App() {
 						</div>
 
 						<button
+							onClick={() => {
+								setMode("input");
+								setViewedResult(null);
+							}}
+							className="ranker-button secondary full-width"
+						>
+							View Saved Rankings
+						</button>
+
+						<button
 							onClick={handleReset}
 							className="ranker-button primary full-width"
 						>
 							Start Over
+						</button>
+					</div>
+				)}
+
+				{mode === "saved" && viewedResult && (
+					<div className="ranker-panel">
+						<h2>Saved Ranking</h2>
+						<p className="comparison-progress">
+							{formatSavedDate(viewedResult.createdAt)}
+						</p>
+						<p className="comparison-progress">
+							Manual comparisons: {viewedResult.manualComparisons} of{" "}
+							{viewedResult.totalComparisons}
+						</p>
+
+						<div className="rankings-list">
+							{viewedResult.items.map((itemName, index) => (
+								<div
+									key={`${viewedResult.id}-${itemName}-${index}`}
+									className="ranking-item"
+								>
+									<div className="ranking-position">#{index + 1}</div>
+									<div className="ranking-info">
+										<div className="ranking-name">{itemName}</div>
+									</div>
+								</div>
+							))}
+						</div>
+
+						<button
+							onClick={() => setMode("input")}
+							className="ranker-button primary full-width"
+						>
+							Back to Input
 						</button>
 					</div>
 				)}

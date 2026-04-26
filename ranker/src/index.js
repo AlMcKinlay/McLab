@@ -15,16 +15,28 @@ root.render(
 const htmlElement = document.documentElement;
 const themeToggle = document.getElementById("themeToggle");
 
-const currentTheme = localStorage.getItem("theme") || "light";
-if (currentTheme === "dark") {
-	htmlElement.classList.add("dark-mode");
-	themeToggle.textContent = "🌙";
+let currentTheme = "light";
+try {
+	currentTheme = localStorage.getItem("theme") || "light";
+} catch {
+	currentTheme = "light";
 }
 
-themeToggle?.addEventListener("click", () => {
-	const isDark = htmlElement.classList.toggle("dark-mode");
-	localStorage.setItem("theme", isDark ? "dark" : "light");
-	themeToggle.textContent = isDark ? "🌙" : "☀️";
-});
+if (currentTheme === "dark") {
+	htmlElement.classList.add("dark-mode");
+}
+
+if (themeToggle) {
+	themeToggle.textContent = currentTheme === "dark" ? "🌙" : "☀️";
+	themeToggle.addEventListener("click", () => {
+		const isDark = htmlElement.classList.toggle("dark-mode");
+		try {
+			localStorage.setItem("theme", isDark ? "dark" : "light");
+		} catch {
+			// Ignore storage failures and keep UI responsive.
+		}
+		themeToggle.textContent = isDark ? "🌙" : "☀️";
+	});
+}
 
 reportWebVitals();
