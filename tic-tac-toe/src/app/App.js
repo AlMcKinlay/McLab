@@ -1,4 +1,5 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { initializeTheme } from "shared-utils";
 import "./App.css";
 
 const BOARD_SIZE = 3;
@@ -51,6 +52,10 @@ function App() {
 	const [isDraw, setIsDraw] = useState(false);
 	const [bullets, setBullets] = useState(INITIAL_BULLETS);
 	const [projectile, setProjectile] = useState(null);
+
+	useEffect(() => {
+		initializeTheme();
+	}, []);
 
 	const activeBulletCorners = useMemo(() => {
 		const cornerMap = new Set();

@@ -8,7 +8,7 @@
 	"license": "MIT",
 	"type": "module",
 	"scripts": {
-		"build": "npm run lint:css && make buildBingo buildPokemonList buildSwitch buildGameDraft buildTicTacToe buildRanker && make copyBuilds",
+		"build": "npm run lint:css && make build",
 		"dev": "npm run build && netlify dev",
 		"bingo:dev": "cd bingo && netlify dev",
 		"game-draft:dev": "cd game-draft && netlify dev",

@@ -5,9 +5,6 @@ import "shared-utils/shared-styles.css";
 import "./index.css";
 import App from "./app/App";
 import reportWebVitals from "./reportWebVitals";
-import { initializeTheme } from "shared-utils";
-
-initializeTheme();
 
 const root = createRoot(document.getElementById("root"));
 
