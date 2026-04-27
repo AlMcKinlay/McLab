@@ -4,8 +4,7 @@ MAKEFLAGS += --silent
 buildBingo:
 	cd bingo && \
 	npm i && \
-	npm run build && \
-	cd ..
+	npm run build
 
 buildFunctions:
 	cd functions/bin && \
@@ -29,8 +28,17 @@ buildSwitch:
 buildGameDraft:
 	cd game-draft && \
 	npm i && \
-	npm run build && \
-	cd ..
+	npm run build
+
+buildTicTacToe:
+	cd tic-tac-toe && \
+	npm i && \
+	npm run build
+
+buildRanker:
+	cd ranker && \
+	npm i && \
+	npm run build
 
 copyBuilds:
 	rm -rf build
@@ -40,10 +48,21 @@ copyBuilds:
 	mv pokemon-dex-sort/build build/pokemon-dex-sort
 	mv switch/build build/switch
 	mv game-draft/build build/game-draft
+	mv tic-tac-toe/build build/tic-tac-toe
+	mv ranker/build build/ranker
 	cp homepage/* build/
 	cp shared/theme-variables.css build/
 
-build: npm_install buildBingo buildFunctions buildPokemonList buildPokemonDexSort buildSwitch buildGameDraft copyBuilds
+build: npm_install \
+	buildBingo \
+	buildFunctions \
+	buildPokemonList \
+	buildPokemonDexSort \
+	buildSwitch \
+	buildGameDraft \
+	buildTicTacToe \
+	buildRanker \
+	copyBuilds
 
 npm_install:
 	npm install

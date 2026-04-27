@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="color-scheme" content="light dark" />
+		<meta name="theme-color" content="#000000" />
+		<meta
+			name="description"
+			content="Tic Tac Toe with Bullet Bill row-clearing power-ups"
+		/>
+		<link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+		<title>Tic Tac Toe + Bullet Bill</title>
+		<script>
+			const savedTheme = localStorage.getItem("theme");
+			const prefersDark = window.matchMedia(
+				"(prefers-color-scheme: dark)",
+			).matches;
+			const theme = savedTheme || (prefersDark ? "dark" : "light");
+			document.documentElement.setAttribute("data-theme", theme);
+		</script>
+	</head>
+	<body>
+		<noscript>You need to enable JavaScript to run this app.</noscript>
+		<div id="root"></div>
+	</body>
+</html>

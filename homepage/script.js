@@ -92,6 +92,22 @@ const apps = [
 		url: "/bingo",
 		thumbnail: "./bingo-thumbnail.png",
 	},
+	{
+		id: "tic-tac-toe",
+		title: "Tic Tac Toe",
+		description: "Classic game with Bullet Bill row clear power-ups",
+		url: "/tic-tac-toe",
+		thumbnail: "./tic-tac-toe-thumbnail.png",
+		thumbnailFallback: true,
+	},
+	{
+		id: "ranker",
+		title: "Ranker",
+		description: "Compare items pairwise to create a complete ranking",
+		url: "/ranker",
+		thumbnail: "./ranker-thumbnail.png",
+		thumbnailFallback: true,
+	},
 ];
 
 // DOM Elements

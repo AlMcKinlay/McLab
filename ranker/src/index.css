@@ -1,0 +1,55 @@
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+	min-height: 100%;
+}
+
+html {
+	/* Keep app-specific semantic tokens mapped to the shared theme palette. */
+	--action-primary: var(--color-success);
+	--action-secondary: var(--color-info);
+	--color-error: var(--color-danger);
+}
+
+body {
+	font-family: "Segoe UI", sans-serif;
+	background: var(--gradient-bg);
+	color: var(--text-primary);
+	color-scheme: light dark;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+	display: flex;
+	flex-direction: column;
+}
+
+.theme-toggle {
+	position: fixed;
+	top: 1rem;
+	right: 1rem;
+	background: var(--toggle-bg);
+	border: 1px solid var(--toggle-bg);
+	border-radius: 50%;
+	width: 3rem;
+	height: 3rem;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 1.5rem;
+	transition: all 0.3s;
+	z-index: 1000;
+}
+
+.theme-toggle:hover {
+	background: var(--toggle-bg-hover);
+	transform: scale(1.1);
+}
