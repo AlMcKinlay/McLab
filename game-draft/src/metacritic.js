@@ -9,10 +9,27 @@ const normalizeString = (str) => {
 		.trim();
 };
 
+const extractYears = (name) => {
+	const matches = name.match(/\b(?:19|20)\d{2}\b/g);
+	return new Set(matches || []);
+};
+
 // Check if two game names match closely enough
 const namesMatch = (searchName, foundName) => {
 	const normalizedSearch = normalizeString(searchName);
 	const normalizedFound = normalizeString(foundName);
+	const searchYears = extractYears(normalizedSearch);
+	const foundYears = extractYears(normalizedFound);
+
+	// If the user provided a year, require the candidate to contain the same year.
+	if (searchYears.size > 0) {
+		const hasMatchingYear = [...searchYears].every((year) =>
+			foundYears.has(year),
+		);
+		if (!hasMatchingYear) {
+			return false;
+		}
+	}
 
 	// Exact match after normalization
 	if (normalizedSearch === normalizedFound) {
@@ -62,8 +79,10 @@ export const fetchMetacriticScore = async (gameName) => {
 
 		console.log(`Searching for: "${gameName}"`);
 
-		// Find the search results container
-		const resultsContainer = doc.querySelector(".c-pageSiteSearch-results");
+		// Find the search results container (Metacritic has changed this markup over time)
+		const resultsContainer = doc.querySelector(
+			".c-search-results, .c-pageSiteSearch-results",
+		);
 		if (!resultsContainer) {
 			console.log("Results container not found");
 			return { score: null, isTbd: false };
@@ -81,7 +100,12 @@ export const fetchMetacriticScore = async (gameName) => {
 		// Check each game link to find a matching title
 		for (let i = 0; i < gameLinks.length; i++) {
 			const gameLink = gameLinks[i];
-			const foundTitle = gameLink.textContent.trim();
+			const titleElement = gameLink.querySelector(
+				".c-search-item__title, [class*='search-item__title']",
+			);
+			const foundTitle = (
+				titleElement?.textContent || gameLink.textContent
+			).trim();
 
 			if (foundTitle) {
 				console.log(`Result ${i + 1}: "${foundTitle}"`);
@@ -91,7 +115,7 @@ export const fetchMetacriticScore = async (gameName) => {
 					foundMatchingGame = true;
 					// Get the closest parent card/container
 					matchingResultCard = gameLink.closest(
-						'[class*="c-productCard"], [class*="product_item"], [class*="search-result"], div',
+						"[data-testid='search-item'], .search-item, .c-search-item, [class*='c-productCard'], [class*='product_item'], [class*='search-result'], div",
 					);
 					console.log(`✓ Match found at position ${i + 1}: "${foundTitle}"`);
 					break; // Found a match, stop looking
@@ -110,13 +134,18 @@ export const fetchMetacriticScore = async (gameName) => {
 			console.log(`Searching for score in matching card...`);
 			// Try multiple selector strategies to find the score
 			const scoreSelectors = [
+				// New search UI
+				'.c-search-item__score [title*="Metascore"] span',
+				'.c-search-item__score [aria-label*="Metascore"] span',
+				".c-search-item__score span",
+				// Older layouts / fallbacks
 				".c-siteReviewScore",
-				'[class*="metascore"]',
-				'[class*="score"]',
+				'[data-testid="product-metascore"]',
 				'[data-type="metascore"]',
-				'div[class*="rating"]',
+				'[class*="metascore"]',
 				'span[class*="score"]',
-				'div[data-testid="product-metascore"]',
+				'div[class*="rating"]',
+				'[class*="score"]',
 			];
 
 			for (const selector of scoreSelectors) {
@@ -165,6 +194,33 @@ export const fetchMetacriticScore = async (gameName) => {
 				if (!isNaN(parsedScore)) {
 					score = parsedScore;
 					console.log(`✓ Score found: ${score}`);
+				}
+			}
+		}
+
+		// Fallback: some cards only expose score in title/aria-label attributes
+		if (score === null && !isTbd && matchingResultCard) {
+			const labeledScoreElement = matchingResultCard.querySelector(
+				'[title*="Metascore"], [aria-label*="Metascore"]',
+			);
+
+			if (labeledScoreElement) {
+				const scoreLabel =
+					labeledScoreElement.getAttribute("title") ||
+					labeledScoreElement.getAttribute("aria-label") ||
+					"";
+				const scoreMatch = scoreLabel.match(/metascore\s+(\d+|tbd)\b/i);
+
+				if (scoreMatch) {
+					const value = scoreMatch[1].toLowerCase();
+					if (value === "tbd") {
+						isTbd = true;
+					} else {
+						const parsedScore = parseInt(value, 10);
+						if (!isNaN(parsedScore)) {
+							score = parsedScore;
+						}
+					}
 				}
 			}
 		}
