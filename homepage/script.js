@@ -108,6 +108,14 @@ const apps = [
 		thumbnail: "./ranker-thumbnail.png",
 		thumbnailFallback: true,
 	},
+	{
+		id: "anniversaries",
+		title: "Video Game Anniversaries",
+		description: "Read-only tracker for yearly game-series anniversaries",
+		url: "/anniversaries",
+		thumbnail: "./anniversaries-thumbnail.png",
+		thumbnailFallback: true,
+	},
 ];
 
 // DOM Elements

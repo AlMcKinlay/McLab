@@ -50,6 +50,7 @@ copyBuilds:
 	mv game-draft/build build/game-draft
 	mv tic-tac-toe/build build/tic-tac-toe
 	mv ranker/build build/ranker
+	cp -R anniversaries build/anniversaries
 	cp homepage/* build/
 	cp shared/theme-variables.css build/
 

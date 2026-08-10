@@ -16,6 +16,7 @@
 		"pokemon-list:dev": "cd pokemon-list && netlify dev",
 		"tic-tac-toe:dev": "cd tic-tac-toe && netlify dev",
 		"ranker:dev": "cd ranker && netlify dev",
+		"anniversaries:dev": "cd anniversaries && netlify dev",
 		"telegram:dev": "cd telegram-bot && node --env-file=.env index.js",
 		"switch:dev": "cd switch && netlify dev",
 		"lint:css": "stylelint '**/*.css' --ignore-path .gitignore",
