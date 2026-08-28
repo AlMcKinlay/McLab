@@ -5,3 +5,5 @@ node_modules
 .DS_Store
 .vscode
 build/
+# Script credentials (never commit)
+scripts/.env

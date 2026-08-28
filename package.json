@@ -19,6 +19,7 @@
 		"anniversaries:dev": "cd anniversaries && netlify dev",
 		"telegram:dev": "cd telegram-bot && node --env-file=.env index.js",
 		"switch:dev": "cd switch && netlify dev",
+		"comics:check": "node scripts/check-finished-comics.js",
 		"lint:css": "stylelint '**/*.css' --ignore-path .gitignore",
 		"prepare": "husky"
 	},
