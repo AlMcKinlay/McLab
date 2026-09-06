@@ -1,20 +1,20 @@
 import { Client } from "@notionhq/client";
+import { config } from "../config.js";
 
-const PAGE_ID = "2e40a3f50f2380d9bc25cd131c02bcd5";
-const COLOR_EXPR = {
-	good: "\\color{2E6F40}\\rule{10px}{10px}",
-	ok: "\\color{FF8C00}\\rule{10px}{10px}",
-	bad: "\\color{9B111E}\\rule{10px}{10px}",
+// Property names in the Nathan Tracker database. The title holds the ISO date
+// so rows read sensibly in Notion; "Day" is the real date property used for
+// every filter so we never have to parse titles.
+const PROPS = {
+	title: "Date",
+	day: "Day",
+	status: "Status",
+	setBy: "Set by",
 };
-const EXPRESSION_TO_RATING = Object.entries(COLOR_EXPR).reduce(
-	(acc, [rating, expression]) => {
-		acc[expression] = rating;
-		return acc;
-	},
-	{},
-);
 
-// Timeout helper for Notion API calls
+const RATING_TO_OPTION = { good: "Good", ok: "OK", bad: "Bad" };
+
+const REQUEST_TIMEOUT_MS = 10000;
+
 function withTimeout(promise, ms, operationName) {
 	return Promise.race([
 		promise,
@@ -27,270 +27,153 @@ function withTimeout(promise, ms, operationName) {
 	]);
 }
 
-function getTodayIdentifiers() {
-	const today = new Date();
+function getClient() {
+	return new Client({ auth: config.notionToken });
+}
+
+// Local-time YYYY-MM-DD. toISOString() would shift to UTC and flip the day
+// around midnight, which is exactly when the 9pm prompt logic runs.
+export function toDateKey(date) {
+	const y = date.getFullYear();
+	const m = String(date.getMonth() + 1).padStart(2, "0");
+	const d = String(date.getDate()).padStart(2, "0");
+	return `${y}-${m}-${d}`;
+}
+
+function optionToRating(optionName) {
+	if (!optionName) return null;
+	const match = Object.entries(RATING_TO_OPTION).find(
+		([, name]) => name.toLowerCase() === optionName.toLowerCase(),
+	);
+	return match ? match[0] : "unknown";
+}
+
+function pageToEntry(page) {
+	const dateKey = page.properties[PROPS.day]?.date?.start ?? null;
+	const optionName = page.properties[PROPS.status]?.select?.name ?? null;
 	return {
-		dayNum: String(today.getDate()),
-		monthName: today.toLocaleString("en-US", { month: "long" }).toLowerCase(),
+		pageId: page.id,
+		dateKey,
+		optionName,
+		rating: optionToRating(optionName),
+		lastEdited: page.last_edited_time,
 	};
 }
 
-function getDateIdentifiers(date) {
-	return {
-		dayNum: String(date.getDate()),
-		monthName: date.toLocaleString("en-US", { month: "long" }).toLowerCase(),
-	};
-}
+// Returns a Map of dateKey -> entry for every row whose Day falls in the
+// inclusive range. If a date somehow has two rows, the most recently edited
+// one wins so a stray duplicate can't hide a real update.
+async function queryRange(notion, fromKey, toKey) {
+	const entries = new Map();
+	let cursor;
+	do {
+		const response = await notion.dataSources.query({
+			data_source_id: config.trackerDataSourceId,
+			filter: {
+				and: [
+					{ property: PROPS.day, date: { on_or_after: fromKey } },
+					{ property: PROPS.day, date: { on_or_before: toKey } },
+				],
+			},
+			sorts: [{ property: PROPS.day, direction: "ascending" }],
+			page_size: 100,
+			start_cursor: cursor,
+		});
 
-function getMonthContext(date = new Date()) {
-	return {
-		monthName: date.toLocaleString("en-US", { month: "long" }).toLowerCase(),
-		monthLabel: date.toLocaleString("en-US", {
-			month: "long",
-			year: "numeric",
-		}),
-		monthIndex: date.getMonth(),
-		year: date.getFullYear(),
-		daysInMonth: new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate(),
-	};
-}
-
-async function listTablesIncludingSynced(notion, rootId) {
-	const tables = [];
-	const pageChildren = await notion.blocks.children.list({
-		block_id: rootId,
-		page_size: 100,
-	});
-
-	for (const block of pageChildren.results) {
-		if (block.type === "table") tables.push(block);
-		if (block.type === "synced_block") {
-			const targetId = block.synced_block.synced_from?.block_id ?? block.id;
-			const childList = await notion.blocks.children.list({
-				block_id: targetId,
-				page_size: 200,
-			});
-			for (const child of childList.results) {
-				if (child.type === "table") tables.push(child);
+		for (const page of response.results) {
+			const entry = pageToEntry(page);
+			if (!entry.dateKey) continue;
+			const existing = entries.get(entry.dateKey);
+			if (!existing || existing.lastEdited < entry.lastEdited) {
+				entries.set(entry.dateKey, entry);
 			}
 		}
-	}
 
-	return tables;
+		cursor = response.has_more ? response.next_cursor : undefined;
+	} while (cursor);
+
+	return entries;
 }
 
-async function fetchTableRows(notion, tableId) {
-	const rowsResp = await notion.blocks.children.list({
-		block_id: tableId,
-		page_size: 200,
-	});
-	return rowsResp.results.filter((r) => r.type === "table_row");
+async function findEntry(notion, dateKey) {
+	const entries = await queryRange(notion, dateKey, dateKey);
+	return entries.get(dateKey) ?? null;
 }
 
-async function buildTablesWithRows(notion) {
-	const tables = await withTimeout(
-		listTablesIncludingSynced(notion, PAGE_ID),
-		8000,
-		"listTablesIncludingSynced",
-	);
-
-	const tablesWithRows = [];
-	for (const table of tables) {
-		const rows = await withTimeout(
-			fetchTableRows(notion, table.id),
-			5000,
-			"fetchTableRows",
-		);
-		if (rows.length > 0) {
-			tablesWithRows.push({ table, rows });
-		}
-	}
-
-	return tablesWithRows;
+function buildProperties({ dateKey, rating, userName }) {
+	return {
+		[PROPS.title]: { title: [{ text: { content: dateKey } }] },
+		[PROPS.day]: { date: { start: dateKey } },
+		[PROPS.status]: { select: { name: RATING_TO_OPTION[rating] } },
+		[PROPS.setBy]: {
+			rich_text: userName ? [{ text: { content: userName } }] : [],
+		},
+	};
 }
 
-function findMonthRow(rows, monthName) {
-	return rows.find((row, idx) => {
-		if (idx === 0) return false;
-		const firstCellText = row.table_row.cells[0][0]?.plain_text
-			?.trim()
-			.toLowerCase();
-		return firstCellText === monthName;
-	});
-}
-
-function buildDayColumnMap(headerCells) {
-	const map = new Map();
-	for (let i = 0; i < headerCells.length; i++) {
-		const text = headerCells[i][0]?.plain_text?.trim();
-		if (!text) continue;
-		const dayNum = Number(text);
-		if (Number.isInteger(dayNum) && dayNum > 0) {
-			map.set(dayNum, i);
-		}
-	}
-	return map;
-}
-
-function getCellExpression(monthRow, dayCol) {
-	if (!monthRow || dayCol == null) return null;
-	const cell = monthRow.table_row.cells[dayCol];
-	return cell && cell.length > 0 ? cell[0]?.equation?.expression || null : null;
-}
-
-function findExpressionForDate(tablesWithRows, dayNum, monthName) {
-	for (const { rows } of tablesWithRows) {
-		const header = rows[0].table_row.cells;
-		const dayCol = header.findIndex(
-			(cell) => cell[0]?.plain_text?.trim() === dayNum,
-		);
-		if (dayCol === -1) continue;
-
-		const monthRow = rows.find((row, idx) => {
-			if (idx === 0) return false;
-			const firstCellText = row.table_row.cells[0][0]?.plain_text
-				?.trim()
-				.toLowerCase();
-			return firstCellText === monthName;
-		});
-		if (!monthRow) continue;
-
-		const cell = monthRow.table_row.cells[dayCol];
-		return cell && cell.length > 0
-			? cell[0]?.equation?.expression || null
-			: null;
-	}
-
-	return null;
-}
-
-async function selectTrackerTable(notion, tables, dayNum, monthName) {
-	for (const table of tables) {
-		const rows = await fetchTableRows(notion, table.id);
-		if (rows.length === 0) continue;
-
-		const header = rows[0].table_row.cells;
-		const dayCol = header.findIndex(
-			(cell) => cell[0]?.plain_text?.trim() === dayNum,
-		);
-		if (dayCol === -1) continue;
-
-		const monthRow = rows.find((row, idx) => {
-			if (idx === 0) return false;
-			const firstCellText = row.table_row.cells[0][0]?.plain_text
-				?.trim()
-				.toLowerCase();
-			return firstCellText === monthName;
-		});
-		if (!monthRow) continue;
-
-		return { table, rows, dayCol, monthRow };
-	}
-
-	return null;
-}
-
-function buildUpdatedCells(monthRow, dayCol, expression) {
-	return monthRow.table_row.cells.map((cell, idx) => {
-		if (idx !== dayCol) return cell;
-		return [
-			{
-				type: "equation",
-				equation: { expression },
-			},
-		];
-	});
-}
-
-async function writeRow(notion, rowId, cells) {
-	await notion.blocks.update({
-		block_id: rowId,
-		table_row: { cells },
-	});
-}
-
-export async function updateNathanSheet(rating) {
-	if (!COLOR_EXPR[rating]) {
+export async function updateNathanSheet(rating, userName = null) {
+	if (!RATING_TO_OPTION[rating]) {
 		throw new Error("Invalid rating. Must be: good, ok, or bad");
 	}
 
-	const notion = new Client({ auth: process.env.NOTION_TOKEN });
-	const { dayNum, monthName } = getTodayIdentifiers();
+	const notion = getClient();
+	const dateKey = toDateKey(new Date());
 
 	try {
-		const tables = await withTimeout(
-			listTablesIncludingSynced(notion, PAGE_ID),
-			8000,
-			"listTablesIncludingSynced",
+		const existing = await withTimeout(
+			findEntry(notion, dateKey),
+			REQUEST_TIMEOUT_MS,
+			"findEntry",
 		);
-		if (tables.length === 0)
-			throw new Error("No table blocks found on the page");
 
-		const selection = await withTimeout(
-			selectTrackerTable(notion, tables, dayNum, monthName),
-			5000,
-			"selectTrackerTable",
-		);
-		if (!selection) {
-			throw new Error(
-				"No table found that matches current month and day; ensure header has day numbers and first column has month names",
+		const properties = buildProperties({ dateKey, rating, userName });
+
+		if (existing) {
+			await withTimeout(
+				notion.pages.update({ page_id: existing.pageId, properties }),
+				REQUEST_TIMEOUT_MS,
+				"pages.update",
+			);
+		} else {
+			await withTimeout(
+				notion.pages.create({
+					parent: {
+						type: "data_source_id",
+						data_source_id: config.trackerDataSourceId,
+					},
+					properties,
+				}),
+				REQUEST_TIMEOUT_MS,
+				"pages.create",
 			);
 		}
 
-		const updatedCells = buildUpdatedCells(
-			selection.monthRow,
-			selection.dayCol,
-			COLOR_EXPR[rating],
-		);
-
-		await withTimeout(
-			writeRow(notion, selection.monthRow.id, updatedCells),
-			5000,
-			"writeRow",
-		);
-
-		return { success: true, rating, date: `${monthName} day ${dayNum}` };
+		return { success: true, rating, date: dateKey };
 	} catch (error) {
 		console.error(
-			`[${new Date().toISOString()}] ✗ updateNathanSheet error: ${
-				error.message
-			}`,
+			`[${new Date().toISOString()}] ✗ updateNathanSheet error: ${error.message}`,
 		);
 		throw error;
 	}
 }
 
 export async function checkTodayFilled() {
-	const notion = new Client({ auth: process.env.NOTION_TOKEN });
-	const { dayNum, monthName } = getTodayIdentifiers();
+	const notion = getClient();
+	const dateKey = toDateKey(new Date());
 
 	try {
-		const tables = await withTimeout(
-			listTablesIncludingSynced(notion, PAGE_ID),
-			8000,
-			"listTablesIncludingSynced",
+		const entry = await withTimeout(
+			findEntry(notion, dateKey),
+			REQUEST_TIMEOUT_MS,
+			"findEntry",
 		);
-		if (tables.length === 0) return { filled: false };
-
-		const selection = await withTimeout(
-			selectTrackerTable(notion, tables, dayNum, monthName),
-			5000,
-			"selectTrackerTable",
-		);
-		if (!selection) return { filled: false };
-
-		const cell = selection.monthRow.table_row.cells[selection.dayCol];
-		const hasContent = cell && cell.length > 0 && cell[0]?.equation?.expression;
-
-		return {
-			filled: !!hasContent,
-			currentRating: hasContent ? cell[0].equation.expression : null,
-		};
+		const filled = !!entry?.optionName;
+		return { filled, currentRating: filled ? entry.rating : null };
 	} catch (error) {
 		console.error(
 			`[${new Date().toISOString()}] ✗ checkTodayFilled error: ${error.message}`,
 		);
-		// Return false (not filled) on timeout to allow retry
+		// Treat a timeout as "not filled" so the caller can prompt and retry
 		if (error.message.includes("timed out")) {
 			return { filled: false, error: "Timeout checking status" };
 		}
@@ -303,94 +186,65 @@ export async function getLastNDaysStatuses(days = 7) {
 		throw new Error("Days must be a positive integer");
 	}
 
-	const notion = new Client({ auth: process.env.NOTION_TOKEN });
+	const notion = getClient();
+	const today = new Date();
+	const start = new Date(today);
+	start.setDate(today.getDate() - (days - 1));
 
 	try {
-		const tablesWithRows = await buildTablesWithRows(notion);
-		if (tablesWithRows.length === 0) return [];
+		const entries = await withTimeout(
+			queryRange(notion, toDateKey(start), toDateKey(today)),
+			REQUEST_TIMEOUT_MS,
+			"queryRange",
+		);
 
 		const results = [];
-		const today = new Date();
-
 		for (let i = 0; i < days; i++) {
-			const date = new Date(today);
-			date.setDate(today.getDate() - i);
-			const { dayNum, monthName } = getDateIdentifiers(date);
-			const expression = findExpressionForDate(
-				tablesWithRows,
-				dayNum,
-				monthName,
-			);
-			const rating = expression
-				? EXPRESSION_TO_RATING[expression] || "unknown"
-				: null;
-
-			results.push({
-				date: date.toISOString(),
-				rating,
-				expression,
-			});
+			const date = new Date(start);
+			date.setDate(start.getDate() + i);
+			const entry = entries.get(toDateKey(date));
+			results.push({ date: date.toISOString(), rating: entry?.rating ?? null });
 		}
-
-		return results.reverse();
+		return results;
 	} catch (error) {
 		console.error(
-			`[${new Date().toISOString()}] ✗ getLastNDaysStatuses error: ${
-				error.message
-			}`,
+			`[${new Date().toISOString()}] ✗ getLastNDaysStatuses error: ${error.message}`,
 		);
 		throw error;
 	}
 }
 
 export async function getMonthStatuses(date = new Date()) {
-	const notion = new Client({ auth: process.env.NOTION_TOKEN });
-	const { monthName, monthLabel, monthIndex, year, daysInMonth } =
-		getMonthContext(date);
+	const notion = getClient();
+	const year = date.getFullYear();
+	const monthIndex = date.getMonth();
+	const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
+	const monthLabel = date.toLocaleString("en-US", {
+		month: "long",
+		year: "numeric",
+	});
 
 	try {
-		const tablesWithRows = await buildTablesWithRows(notion);
-		if (tablesWithRows.length === 0) return null;
-
-		let monthRow = null;
-		let dayColumnMap = null;
-
-		for (const { rows } of tablesWithRows) {
-			const headerCells = rows[0]?.table_row?.cells;
-			if (!headerCells || headerCells.length === 0) continue;
-			const candidateMonthRow = findMonthRow(rows, monthName);
-			if (!candidateMonthRow) continue;
-
-			monthRow = candidateMonthRow;
-			dayColumnMap = buildDayColumnMap(headerCells);
-			break;
-		}
-
-		if (!monthRow || !dayColumnMap) return null;
+		const entries = await withTimeout(
+			queryRange(
+				notion,
+				toDateKey(new Date(year, monthIndex, 1)),
+				toDateKey(new Date(year, monthIndex, daysInMonth)),
+			),
+			REQUEST_TIMEOUT_MS,
+			"queryRange",
+		);
 
 		const statuses = [];
 		for (let day = 1; day <= daysInMonth; day++) {
-			const dayCol = dayColumnMap.get(day);
-			const expression = getCellExpression(monthRow, dayCol);
-			const rating = expression
-				? EXPRESSION_TO_RATING[expression] || "unknown"
-				: null;
-			statuses.push({ day, rating, expression });
+			const entry = entries.get(toDateKey(new Date(year, monthIndex, day)));
+			statuses.push({ day, rating: entry?.rating ?? null });
 		}
 
-		return {
-			monthName,
-			monthLabel,
-			monthIndex,
-			year,
-			daysInMonth,
-			statuses,
-		};
+		return { monthLabel, monthIndex, year, daysInMonth, statuses };
 	} catch (error) {
 		console.error(
-			`[${new Date().toISOString()}] ✗ getMonthStatuses error: ${
-				error.message
-			}`,
+			`[${new Date().toISOString()}] ✗ getMonthStatuses error: ${error.message}`,
 		);
 		throw error;
 	}
