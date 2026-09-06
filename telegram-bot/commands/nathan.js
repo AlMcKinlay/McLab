@@ -23,7 +23,11 @@ function withTimeout(promise, ms, operationName) {
 
 async function performUpdate(ctx, rating, userName, editMessage = false) {
 	try {
-		await withTimeout(updateNathanSheet(rating), 10000, "updateNathanSheet");
+		await withTimeout(
+			updateNathanSheet(rating, userName),
+			10000,
+			"updateNathanSheet",
+		);
 		const emoji = rating === "good" ? "😊" : rating === "ok" ? "😐" : "😞";
 		const message = `${emoji} **${userName}** rated today as **${rating.toUpperCase()}**\n\n✓ Successfully updated in Notion!`;
 

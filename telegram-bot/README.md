@@ -25,7 +25,7 @@ A Telegram bot for the McKinlays
 2. Click "Create new integration"
 3. Give it a name and create
 4. Copy the token
-5. Share your Notion page with this integration
+5. Share your Notion page with this integration (it needs read, update and insert content)
 
 ### 2. Configure Environment
 
@@ -54,6 +54,11 @@ npm run telegram:dev
 
 # Or run in the background (see deployment section)
 ```
+
+### 4. Create the Notion database
+
+Statuses live in a Notion database with one row per day (`Date` title,
+`Day` date, `Status` select of Good/OK/Bad, `Set by` text).
 
 ## Deployment
 
@@ -165,20 +170,19 @@ docker run -d --restart always \
 
 Once running, the bot responds to:
 
-- `/nathan` - Shows rating buttons (Good 😊 / OK 😐 / Bad 😞)
+- 📊 Set Nathan Status - Shows rating buttons (Good 😊 / OK 😐 / Bad 😞)
+- 🗓️ Last 7 Days / This Month / Last Month - Emoji summaries from the database
 - `/help` - Shows available commands
-- 📊 Button - Quick access to rate your day
 
 Click a rating button and the bot will:
 
 1. Check if today's already rated
 2. Ask for confirmation if needed
-3. Update your Notion page
+3. Upsert today's row in the Notion database
 4. Confirm the update
 
 ## Commands Available
 
-- `/nathan` - Rate today's day
 - `/help` - Show help message
 - `/start` - Show welcome message
 
@@ -214,8 +218,8 @@ pm2 logs kildonan-bot
 
 - Check `NOTION_TOKEN` is correct in `.env`
 - Verify bot integration has access to your Notion page
+- Check `NOTION_TRACKER_DATA_SOURCE_ID` matches the database (re-run the migration script to print it)
 - Check logs for specific error message
-- Ensure your Notion table has today's date as a column header
 
 **Service won't start:**
 

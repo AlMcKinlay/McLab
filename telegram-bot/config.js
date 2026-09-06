@@ -6,8 +6,12 @@ export const config = {
 	// Get the group chat ID by sending a message to the group and checking logs
 	groupChatId: process.env.TELEGRAM_GROUP_CHAT_ID || null,
 
-	// Notion token for updating the sheet
+	// Notion token for updating the tracker
 	notionToken: process.env.NOTION_TOKEN || "",
+
+	// Data source ID of the Nathan Tracker database. Printed by
+	// scripts/migrate-tracker-to-database.mjs when it creates the database.
+	trackerDataSourceId: process.env.NOTION_TRACKER_DATA_SOURCE_ID || "",
 };
 
 // Validate configuration
@@ -19,5 +23,15 @@ if (!config.botToken) {
 
 if (!config.notionToken) {
 	console.error("ERROR: NOTION_TOKEN environment variable is not set");
+	process.exit(1);
+}
+
+if (!config.trackerDataSourceId) {
+	console.error(
+		"ERROR: NOTION_TRACKER_DATA_SOURCE_ID environment variable is not set",
+	);
+	console.error(
+		"Run scripts/migrate-tracker-to-database.mjs to create the database and get its data source ID",
+	);
 	process.exit(1);
 }
