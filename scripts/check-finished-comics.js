@@ -275,15 +275,16 @@ async function checkSeries(series, read) {
       : `all ${detail.issue_count} issues logged (numbering ends at #${final})`;
     return { verdict: 'ARCHIVE', detail: `${status}, ${basis}${suffix}` };
   }
+  // Finished series with issues still unread are routine — Marvel Unlimited
+  // runs ~3 months behind print — so they stay out of the default report.
   return {
-    verdict: 'UNFINISHED',
+    verdict: 'OK',
     detail: `${status} at #${final}, you're at ${read?.max != null ? `#${read.max}` : 'no issues logged'}${suffix}`,
   };
 }
 
 const SECTIONS = [
   ['ARCHIVE', '🗄️  Ready to archive — series finished and final issue read'],
-  ['UNFINISHED', '📖 Finished series with issues still unread'],
   ['CHECK', '👀 Check manually'],
   ['NOTFOUND', '❓ Not found on Metron'],
 ];
@@ -333,7 +334,7 @@ async function main() {
 
   const ok = results.filter((r) => r.verdict === 'OK');
   if (showAll && ok.length) {
-    console.log(`\n✅ Ongoing (${ok.length})`);
+    console.log(`\n✅ Nothing to do yet — ongoing or still reading (${ok.length})`);
     for (const r of ok) console.log(`  - ${r.series.name} — ${r.detail}`);
   }
 
@@ -341,7 +342,7 @@ async function main() {
     .filter(([, n]) => n)
     .map(([key, n]) => `${key.toLowerCase()}: ${n}`)
     .join(', ');
-  console.log(`\nChecked ${results.length} series — ongoing: ${ok.length}${counts ? `, ${counts}` : ''}.`);
+  console.log(`\nChecked ${results.length} series — nothing to do: ${ok.length}${counts ? `, ${counts}` : ''}.`);
 }
 
 main().catch((err) => {
