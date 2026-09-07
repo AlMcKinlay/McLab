@@ -5,6 +5,7 @@ import {
 	getLastNDaysStatuses,
 	getMonthStatuses,
 } from "../apis/notion.js";
+import { syncHomeAssistant } from "../apis/homeAssistant.js";
 
 const pendingConfirmations = new Map();
 
@@ -56,6 +57,8 @@ async function performUpdate(ctx, rating, userName, editMessage = false) {
 		console.log(
 			`[${new Date().toISOString()}] ✓ ${userName} updated nathan sheet: ${rating}`,
 		);
+		// Deliberately not awaited: the chat reply must not wait on Home Assistant
+		syncHomeAssistant({ pastYears: "skip" });
 	} catch (err) {
 		console.error(
 			`[${new Date().toISOString()}] ✗ Update failed for ${userName}: ${err.message}`,

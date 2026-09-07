@@ -12,6 +12,11 @@ export const config = {
 	// Data source ID of the Nathan Tracker database. Printed by
 	// scripts/migrate-tracker-to-database.mjs when it creates the database.
 	trackerDataSourceId: process.env.NOTION_TRACKER_DATA_SOURCE_ID || "",
+
+	// Optional: push tracker state to Home Assistant. Both must be set to enable.
+	// Create the token under your Home Assistant profile > Long-lived access tokens.
+	homeAssistantUrl: (process.env.HOME_ASSISTANT_URL || "").replace(/\/+$/, ""),
+	homeAssistantToken: process.env.HOME_ASSISTANT_TOKEN || "",
 };
 
 // Validate configuration

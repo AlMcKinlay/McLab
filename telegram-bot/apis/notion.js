@@ -249,3 +249,70 @@ export async function getMonthStatuses(date = new Date()) {
 		throw error;
 	}
 }
+
+const MONTH_NAMES = [
+	"January", "February", "March", "April", "May", "June",
+	"July", "August", "September", "October", "November", "December",
+];
+
+// Whole-year view for the Home Assistant grid. Days after today in the
+// current year are marked "future" so the card can leave them blank rather
+// than showing them as missing.
+export async function getYearStatuses(year) {
+	const notion = getClient();
+	const todayKey = toDateKey(new Date());
+
+	try {
+		const entries = await withTimeout(
+			queryRange(notion, `${year}-01-01`, `${year}-12-31`),
+			REQUEST_TIMEOUT_MS,
+			"queryRange",
+		);
+
+		const counts = { good: 0, ok: 0, bad: 0 };
+		const months = MONTH_NAMES.map((name, monthIndex) => {
+			const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
+			const days = [];
+			for (let day = 1; day <= daysInMonth; day++) {
+				const key = toDateKey(new Date(year, monthIndex, day));
+				if (key > todayKey) {
+					days.push("future");
+					continue;
+				}
+				const rating = entries.get(key)?.rating ?? null;
+				if (rating in counts) counts[rating]++;
+				days.push(rating);
+			}
+			return { name, days };
+		});
+
+		return { year, months, counts, tracked: entries.size };
+	} catch (error) {
+		console.error(
+			`[${new Date().toISOString()}] ✗ getYearStatuses error: ${error.message}`,
+		);
+		throw error;
+	}
+}
+
+export async function getFirstTrackedYear() {
+	const notion = getClient();
+	try {
+		const response = await withTimeout(
+			notion.dataSources.query({
+				data_source_id: config.trackerDataSourceId,
+				sorts: [{ property: PROPS.day, direction: "ascending" }],
+				page_size: 1,
+			}),
+			REQUEST_TIMEOUT_MS,
+			"dataSources.query",
+		);
+		const first = response.results[0]?.properties[PROPS.day]?.date?.start;
+		return first ? Number(first.slice(0, 4)) : new Date().getFullYear();
+	} catch (error) {
+		console.error(
+			`[${new Date().toISOString()}] ✗ getFirstTrackedYear error: ${error.message}`,
+		);
+		throw error;
+	}
+}

@@ -1,4 +1,5 @@
 import { checkTodayFilled } from "./apis/notion.js";
+import { syncHomeAssistant } from "./apis/homeAssistant.js";
 import { config } from "./config.js";
 
 // Track whether we've already prompted today
@@ -31,35 +32,46 @@ function setPromptedToday() {
 	lastPromptDate = new Date().toDateString();
 }
 
-function getTimeUntilNext9pm() {
+function getTimeUntilNext(hour, minute) {
 	const now = new Date();
-	const next9pm = new Date();
-	next9pm.setHours(21, 0, 0, 0);
+	const next = new Date();
+	next.setHours(hour, minute, 0, 0);
 
-	// If it's already past 9pm today, schedule for tomorrow
-	if (now > next9pm) {
-		next9pm.setDate(next9pm.getDate() + 1);
+	// If that time has already passed today, schedule for tomorrow
+	if (now > next) {
+		next.setDate(next.getDate() + 1);
 	}
 
-	return next9pm.getTime() - now.getTime();
+	return next.getTime() - now.getTime();
 }
 
-export async function initializeScheduler(bot) {
-	function scheduleNext9pmPrompt() {
-		const timeUntil = getTimeUntilNext9pm();
-		const next9pm = new Date(Date.now() + timeUntil);
+function scheduleDaily(hour, minute, label, task) {
+	function scheduleNext() {
+		const timeUntil = getTimeUntilNext(hour, minute);
+		const next = new Date(Date.now() + timeUntil);
 
 		console.log(
-			`[${new Date().toISOString()}] ⏰ Next daily status prompt scheduled for ${next9pm.toLocaleString()}`,
+			`[${new Date().toISOString()}] ⏰ Next ${label} scheduled for ${next.toLocaleString()}`,
 		);
 
 		setTimeout(async () => {
-			await sendDailyPrompt(bot);
-			scheduleNext9pmPrompt();
+			await task();
+			scheduleNext();
 		}, timeUntil);
 	}
 
-	scheduleNext9pmPrompt();
+	scheduleNext();
+}
+
+export async function initializeScheduler(bot) {
+	scheduleDaily(21, 0, "daily status prompt", () => sendDailyPrompt(bot));
+
+	// Shortly after midnight the "today" sensor must reset to unset, and any
+	// year sensor Home Assistant has dropped gets re-pushed. On 1 January this
+	// is also what publishes the newly completed year.
+	scheduleDaily(0, 5, "Home Assistant refresh", () =>
+		syncHomeAssistant({ pastYears: "missing" }),
+	);
 }
 
 async function sendDailyPrompt(bot) {
