@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Generated on Fri, 11 Sep 2026 12:20:09 -0700 -->
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <atom:link href="https://store.steampowered.com/news/app/413150/" rel="self" type="application/rss+xml" />
+    <title>413150 RSS Feed</title>
+    <link><![CDATA[https://store.steampowered.com/news/app/413150/]]></link>
+    <description><![CDATA[Events and Announcements for 413150]]></description>
+    <language>en-us</language>
+    <generator>Steam News RSS</generator>
+    <item>
+      <title>Patch 1.6.15 &amp; &quot;hotfix&quot; &#8212; notes</title>
+      <description>&lt;p class=&quot;bb_paragraph&quot;&gt;Fixes &amp;amp; tweaks.&lt;/p&gt;</description>
+      <link><![CDATA[https://store.steampowered.com/news/app/413150/view/516361985249509911]]></link>
+      <pubDate>Thu, 26 Feb 2026 23:40:00 +0000</pubDate>
+      <guid isPermaLink="true">https://store.steampowered.com/news/app/413150/view/516361985249509911</guid>
+      <enclosure url="https://clan.fastly.steamstatic.com/images/11170746/80df16c8.png" length="0" type="image/png" />
+    </item>
+    <item>
+      <title>Older post</title>
+      <description><![CDATA[<p>Contains a ]]]]><![CDATA[> sequence</p>]]></description>
+      <link><![CDATA[https://store.steampowered.com/news/app/413150/view/606425106922603867]]></link>
+      <pubDate>Fri, 21 Nov 2025 17:58:09 +0000</pubDate>
+      <guid isPermaLink="true">https://store.steampowered.com/news/app/413150/view/606425106922603867</guid>
+    </item>
+    <item>
+      <title>No date, should be skipped</title>
+      <description>x</description>
+      <link><![CDATA[https://store.steampowered.com/news/app/413150/view/1]]></link>
+      <guid isPermaLink="true">https://store.steampowered.com/news/app/413150/view/1</guid>
+    </item>
+  </channel>
+</rss>

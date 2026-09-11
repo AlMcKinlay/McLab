@@ -21,10 +21,14 @@
 		"switch:dev": "cd switch && netlify dev",
 		"comics:check": "node scripts/check-finished-comics.js",
 		"lint:css": "stylelint '**/*.css' --ignore-path .gitignore",
-		"prepare": "husky"
+		"prepare": "husky",
+		"steam-news:dev": "cd steam-news && node --env-file=.env index.js --once"
 	},
 	"lint-staged": {
 		"**/*.css": "stylelint --ignore-path .gitignore"
+	},
+	"dependencies": {
+		"@netlify/blobs": "^11.0.3"
 	},
 	"devDependencies": {
 		"husky": "^9.1.7",
