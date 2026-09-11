@@ -25,7 +25,7 @@ A Telegram bot for the McKinlays
 2. Click "Create new integration"
 3. Give it a name and create
 4. Copy the token
-5. Share your Notion page with this integration
+5. Share your Notion page with this integration (it needs read, update and insert content)
 
 ### 2. Configure Environment
 
@@ -54,6 +54,24 @@ npm run telegram:dev
 
 # Or run in the background (see deployment section)
 ```
+
+### 4. Create the Notion database
+
+Statuses live in a Notion database with one row per day (`Date` title,
+`Day` date, `Status` select of Good/OK/Bad, `Set by` text).
+
+### 5. Optional: Home Assistant
+
+Set `HOME_ASSISTANT_URL` and `HOME_ASSISTANT_TOKEN` in `.env` and the bot
+pushes statuses to Home Assistant over its REST API: `sensor.nathan_tracker`
+(today, last 7 days, current month) and one `sensor.nathan_tracker_<year>` per
+tracked year with a month-by-day grid. Pushes happen after every rating, at
+startup, and shortly after midnight; completed years are only re-sent when
+Home Assistant has lost them (for example after a restart).
+
+The Home Assistant helper, automation and dashboard cards (including the
+yearly grid with a year selector) are in
+[homeassistant/nathan-tracker.yaml](homeassistant/nathan-tracker.yaml).
 
 ## Deployment
 
@@ -165,20 +183,20 @@ docker run -d --restart always \
 
 Once running, the bot responds to:
 
-- `/nathan` - Shows rating buttons (Good 😊 / OK 😐 / Bad 😞)
+- 📊 Set Nathan Status - Shows rating buttons (Good 😊 / OK 😐 / Bad 😞)
+- 🗓️ Last 7 Days / This Month / Last Month - Emoji summaries from the database
+- Every rating is also pushed to Home Assistant when configured
 - `/help` - Shows available commands
-- 📊 Button - Quick access to rate your day
 
 Click a rating button and the bot will:
 
 1. Check if today's already rated
 2. Ask for confirmation if needed
-3. Update your Notion page
+3. Upsert today's row in the Notion database
 4. Confirm the update
 
 ## Commands Available
 
-- `/nathan` - Rate today's day
 - `/help` - Show help message
 - `/start` - Show welcome message
 
@@ -214,8 +232,8 @@ pm2 logs kildonan-bot
 
 - Check `NOTION_TOKEN` is correct in `.env`
 - Verify bot integration has access to your Notion page
+- Check `NOTION_TRACKER_DATA_SOURCE_ID` matches the database (re-run the migration script to print it)
 - Check logs for specific error message
-- Ensure your Notion table has today's date as a column header
 
 **Service won't start:**
 

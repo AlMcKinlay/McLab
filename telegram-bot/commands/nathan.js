@@ -5,6 +5,7 @@ import {
 	getLastNDaysStatuses,
 	getMonthStatuses,
 } from "../apis/notion.js";
+import { syncHomeAssistant } from "../apis/homeAssistant.js";
 
 const pendingConfirmations = new Map();
 
@@ -23,7 +24,11 @@ function withTimeout(promise, ms, operationName) {
 
 async function performUpdate(ctx, rating, userName, editMessage = false) {
 	try {
-		await withTimeout(updateNathanSheet(rating), 10000, "updateNathanSheet");
+		await withTimeout(
+			updateNathanSheet(rating, userName),
+			10000,
+			"updateNathanSheet",
+		);
 		const emoji = rating === "good" ? "😊" : rating === "ok" ? "😐" : "😞";
 		const message = `${emoji} **${userName}** rated today as **${rating.toUpperCase()}**\n\n✓ Successfully updated in Notion!`;
 
@@ -52,6 +57,8 @@ async function performUpdate(ctx, rating, userName, editMessage = false) {
 		console.log(
 			`[${new Date().toISOString()}] ✓ ${userName} updated nathan sheet: ${rating}`,
 		);
+		// Deliberately not awaited: the chat reply must not wait on Home Assistant
+		syncHomeAssistant({ pastYears: "skip" });
 	} catch (err) {
 		console.error(
 			`[${new Date().toISOString()}] ✗ Update failed for ${userName}: ${err.message}`,

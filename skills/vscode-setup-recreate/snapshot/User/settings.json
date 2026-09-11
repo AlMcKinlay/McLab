@@ -1,0 +1,14 @@
+{
+  "workbench.colorTheme": "Dark+",
+  "workbench.startupEditor": "none",
+  "git.autofetch": true,
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "git.pruneOnFetch": true,
+  "task.allowAutomaticTasks": "on",
+  "git-graph.dialog.fetchRemote.prune": true,
+  "git.confirmSync": false,
+  "github.copilot.nextEditSuggestions.enabled": true,
+  "explorer.confirmPasteNative": false,
+  "chat.viewSessions.orientation": "stacked"
+}

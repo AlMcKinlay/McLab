@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta name="color-scheme" content="light dark" />
+		<title>Video Game Anniversaries</title>
+		<link rel="stylesheet" href="theme-variables.css" />
+		<link rel="stylesheet" href="styles.css" />
+		<script>
+			// Apply theme immediately to prevent flash of wrong theme
+			const savedTheme = localStorage.getItem("theme");
+			const prefersDark = window.matchMedia(
+				"(prefers-color-scheme: dark)",
+			).matches;
+			const theme = savedTheme || (prefersDark ? "dark" : "light");
+			document.documentElement.setAttribute("data-theme", theme);
+		</script>
+	</head>
+	<body>
+		<button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+			☀️
+		</button>
+
+		<main class="app-container">
+			<header class="page-header">
+				<h1>Game Anniversaries</h1>
+				<p class="subtitle" id="todaySummary"></p>
+			</header>
+
+			<section class="section-card" aria-labelledby="next-heading">
+				<div class="section-header">
+					<h2 id="next-heading">Next Anniversary</h2>
+				</div>
+				<ul class="anniversary-list" id="nextList"></ul>
+			</section>
+
+			<section class="tabs-wrapper" aria-label="Anniversary sections">
+				<div class="tabs" role="tablist" aria-label="Anniversary section tabs">
+					<button
+						class="tab-button"
+						id="tab-button-past-year"
+						type="button"
+						role="tab"
+						aria-selected="false"
+						aria-controls="tab-panel-past-year"
+						data-target="tab-panel-past-year"
+						tabindex="-1"
+					>
+						Past Year
+					</button>
+					<button
+						class="tab-button active"
+						id="tab-button-this-year"
+						type="button"
+						role="tab"
+						aria-selected="true"
+						aria-controls="tab-panel-this-year"
+						data-target="tab-panel-this-year"
+					>
+						This Year
+					</button>
+					<button
+						class="tab-button"
+						id="tab-button-next-year"
+						type="button"
+						role="tab"
+						aria-selected="false"
+						aria-controls="tab-panel-next-year"
+						data-target="tab-panel-next-year"
+						tabindex="-1"
+					>
+						Next Year
+					</button>
+				</div>
+
+				<div
+					class="tab-panel active"
+					id="tab-panel-this-year"
+					role="tabpanel"
+					aria-labelledby="tab-button-this-year"
+				>
+					<section class="section-card" aria-labelledby="this-year-heading">
+						<div class="section-header">
+							<h2 id="this-year-heading">This Year</h2>
+						</div>
+						<ul class="anniversary-list" id="nextTwoMonthsList"></ul>
+					</section>
+				</div>
+
+				<div
+					class="tab-panel"
+					id="tab-panel-past-year"
+					role="tabpanel"
+					aria-labelledby="tab-button-past-year"
+					hidden
+				>
+					<section class="section-card" aria-labelledby="past-heading">
+						<div class="section-header">
+							<h2 id="past-heading">Past Year</h2>
+						</div>
+						<ul class="anniversary-list" id="pastList"></ul>
+					</section>
+				</div>
+
+				<div
+					class="tab-panel"
+					id="tab-panel-next-year"
+					role="tabpanel"
+					aria-labelledby="tab-button-next-year"
+					hidden
+				>
+					<section class="section-card" aria-labelledby="upcoming-heading">
+						<div class="section-header">
+							<h2 id="upcoming-heading">Next Year</h2>
+						</div>
+						<ul class="anniversary-list" id="upcomingList"></ul>
+					</section>
+				</div>
+			</section>
+		</main>
+
+		<script type="module" src="script.js"></script>
+	</body>
+</html>

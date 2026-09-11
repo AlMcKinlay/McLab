@@ -16,18 +16,23 @@
 		"pokemon-list:dev": "cd pokemon-list && netlify dev",
 		"tic-tac-toe:dev": "cd tic-tac-toe && netlify dev",
 		"ranker:dev": "cd ranker && netlify dev",
+		"anniversaries:dev": "cd anniversaries && netlify dev",
 		"telegram:dev": "cd telegram-bot && node --env-file=.env index.js",
 		"switch:dev": "cd switch && netlify dev",
+		"comics:check": "node scripts/check-finished-comics.js",
 		"lint:css": "stylelint '**/*.css' --ignore-path .gitignore",
-		"prepare": "husky"
+		"prepare": "husky",
+		"steam-news:dev": "cd steam-news && node --env-file=.env index.js --once"
 	},
 	"lint-staged": {
 		"**/*.css": "stylelint --ignore-path .gitignore"
 	},
+	"dependencies": {
+		"@netlify/blobs": "^11.0.3"
+	},
 	"devDependencies": {
 		"husky": "^9.1.7",
 		"lint-staged": "^17.0.0",
-		"stylelint": "^16.0.0",
-		"stylelint-config-standard": "^36.0.0"
+		"stylelint": "^17.0.0"
 	}
 }

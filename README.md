@@ -17,6 +17,7 @@ A mono-repo of small web apps/experiments plus a static homepage that links to t
 - `build/`: compiled output (generated; ignored by git).
 - `functions/bin/`: a Netlify Function for bin collection notifications.
 - `telegram-bot/`: a Node.js Telegram bot (with Notion integration) intended to run on a server or Raspberry Pi.
+- `steam-news/`: a Node.js service that merges the Steam news feeds of all followed games into one RSS feed, run on the same Pi and published through `functions/steam-news.js`.
 - Root `Makefile`: orchestrates building apps and assembling `build/` output.
 
 ## Tooling and conventions
@@ -31,6 +32,7 @@ A mono-repo of small web apps/experiments plus a static homepage that links to t
 
 - `npm run dev`: runs `make build` then serves `build/` on http://localhost:8080 (no cache).
 - `npm run homepage:dev`: serves the homepage only (http://localhost:8080).
+- `npm run anniversaries:dev`: serves only the `anniversaries/` static app locally via Netlify Dev (http://localhost:8888).
 - `npm run telegram:dev`: runs the Telegram bot locally using `.env` in `telegram-bot/`.
 - `npm run telegram:install`: installs Telegram bot dependencies.
 
@@ -89,6 +91,12 @@ Assumption:
 - Purpose: a Telegram bot for the McKinlays that records day ratings to Notion.
 - Full bot setup and operation details are in [telegram-bot/README.md](telegram-bot/README.md).
 
+## Steam news feed
+
+- Runs on the Pi next to the Telegram bot and pushes a merged RSS feed to the Netlify function at `/steam-news.xml` (stored in Netlify Blobs).
+- Requires `STEAM_NEWS_PUSH_SECRET` in the Netlify environment.
+- Setup, Steam login and systemd details are in [steam-news/README.md](steam-news/README.md).
+
 ## Adding a new app (expected pattern)
 
 If you add a new app, you’ll likely want to:
@@ -99,6 +107,32 @@ If you add a new app, you’ll likely want to:
 4. Set the app `homepage` field in `package.json` to match the deployed subpath.
 5. Add the app entry in `homepage/script.js` so it appears on the homepage.
 6. If the app needs server-side logic, add a new Netlify function under `functions/`.
+
+### Static app checklist (HTML/CSS/JS, non-React)
+
+Use this when adding small read-only/static tools (like `anniversaries/`) so they fit repo conventions and can run independently.
+
+1. Create app folder with `index.html`, `styles.css`, `script.js`, and optional `data.js` config.
+2. Add `netlify.toml` in the app folder:
+
+- `[dev]`
+- `publish = "."`
+- `port = 8888`
+
+3. Add a root script in `package.json` (for example: `"my-app:dev": "cd my-app && netlify dev"`).
+4. Use shared theme variables in app HTML (`<link rel="stylesheet" href="../theme-variables.css" />`) and include theme toggle behavior.
+5. Add the app to homepage cards in `homepage/script.js` with `url: "/<app-folder>"`.
+6. Update `Makefile` `copyBuilds` to copy the folder into `build/<app-folder>` (for example `cp -R my-app build/my-app`).
+7. Validate with:
+
+- `npm run lint:css`
+- `npm run build`
+- `npm run <app>:dev`
+
+Notes:
+
+- Root `npm run dev` is a full multi-app build + serve flow and may be heavy locally; per-app `:<name>:dev` scripts are preferred for day-to-day local work on static apps.
+- `make build` currently runs `npm i` in app folders, which can modify lockfiles during local validation runs.
 
 ## Assumptions I will follow when adding or updating things
 

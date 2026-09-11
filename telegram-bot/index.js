@@ -3,6 +3,10 @@ import { message } from "telegraf/filters";
 import { config } from "./config.js";
 import { registerNathanCommands } from "./commands/nathan.js";
 import { initializeScheduler } from "./scheduler.js";
+import {
+	isHomeAssistantEnabled,
+	syncHomeAssistant,
+} from "./apis/homeAssistant.js";
 
 const bot = new Telegraf(config.botToken);
 
@@ -174,6 +178,16 @@ async function startBot() {
 
 				// Initialize daily scheduler
 				initializeScheduler(bot);
+
+				if (isHomeAssistantEnabled()) {
+					// Home Assistant loses REST-set sensors on restart, so
+					// repopulate everything whenever the bot comes up
+					syncHomeAssistant({ pastYears: "force" });
+				} else {
+					console.log(
+						`[${new Date().toISOString()}] ℹ️ Home Assistant push disabled (HOME_ASSISTANT_URL/TOKEN not set)`,
+					);
+				}
 			});
 			break;
 		} catch (error) {
