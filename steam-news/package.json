@@ -1,0 +1,20 @@
+{
+	"name": "steam-news",
+	"version": "1.0.0",
+	"description": "Aggregates Steam news for followed games into one RSS feed",
+	"main": "index.js",
+	"type": "module",
+	"private": true,
+	"scripts": {
+		"start": "node --env-file=.env index.js",
+		"once": "node --env-file=.env index.js --once",
+		"login": "node scripts/login.js",
+		"test": "node --test"
+	},
+	"engines": {
+		"node": ">=24"
+	},
+	"dependencies": {
+		"steam-session": "^1.9.4"
+	}
+}

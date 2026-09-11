@@ -17,6 +17,7 @@ A mono-repo of small web apps/experiments plus a static homepage that links to t
 - `build/`: compiled output (generated; ignored by git).
 - `functions/bin/`: a Netlify Function for bin collection notifications.
 - `telegram-bot/`: a Node.js Telegram bot (with Notion integration) intended to run on a server or Raspberry Pi.
+- `steam-news/`: a Node.js service that merges the Steam news feeds of all followed games into one RSS feed, run on the same Pi and published through `functions/steam-news.js`.
 - Root `Makefile`: orchestrates building apps and assembling `build/` output.
 
 ## Tooling and conventions
@@ -89,6 +90,12 @@ Assumption:
 - Runs separately from Netlify (typically on a home Raspberry Pi).
 - Purpose: a Telegram bot for the McKinlays that records day ratings to Notion.
 - Full bot setup and operation details are in [telegram-bot/README.md](telegram-bot/README.md).
+
+## Steam news feed
+
+- Runs on the Pi next to the Telegram bot and pushes a merged RSS feed to the Netlify function at `/steam-news.xml` (stored in Netlify Blobs).
+- Requires `STEAM_NEWS_PUSH_SECRET` in the Netlify environment.
+- Setup, Steam login and systemd details are in [steam-news/README.md](steam-news/README.md).
 
 ## Adding a new app (expected pattern)
 
