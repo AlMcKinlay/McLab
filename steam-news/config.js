@@ -34,7 +34,6 @@ export const config = {
 
 	pollIntervalMs: intEnv("POLL_INTERVAL_MINUTES", 30) * 60 * 1000,
 	maxFeedItems: intEnv("MAX_FEED_ITEMS", 500),
-	maxStoredItems: intEnv("MAX_STORED_ITEMS", 1500),
 	// How many existing posts to import when a game is followed for the first
 	// time, so following an old game doesn't flood the feed with its history.
 	newAppItemLimit: intEnv("NEW_APP_ITEM_LIMIT", 3),
