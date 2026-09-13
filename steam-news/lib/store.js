@@ -26,13 +26,31 @@ export function saveStore(file, store) {
 	fs.renameSync(tmp, file);
 }
 
-export function sortedItems(store) {
-	return Object.values(store.items).sort(
-		(a, b) => Date.parse(b.pubDate) - Date.parse(a.pubDate),
-	);
+export function sortedItems(store, { includeHidden = false } = {}) {
+	return Object.values(store.items)
+		.filter((item) => includeHidden || !item.hidden)
+		.sort((a, b) => Date.parse(b.pubDate) - Date.parse(a.pubDate));
 }
 
-export function pruneItems(store, max) {
-	const keep = sortedItems(store).slice(0, max);
-	store.items = Object.fromEntries(keep.map((item) => [item.id, item]));
+// Forgetting a post Steam still lists would make it look new again on the
+// next poll, so each followed app's newest posts are kept however old they
+// are. Nothing else needs keeping: readers hold their own copies of what
+// they've fetched. Unfollowed apps are dropped entirely, so re-following one
+// later counts as a first sight again.
+export function pruneStore(store, { keepPerApp, apps }) {
+	const counts = new Map();
+	const kept = {};
+	for (const item of sortedItems(store, { includeHidden: true })) {
+		for (const app of [item.appId, ...(item.alsoIn ?? [])]) {
+			if (!apps.has(app)) continue;
+			const seen = counts.get(app) ?? 0;
+			if (seen >= keepPerApp) continue;
+			counts.set(app, seen + 1);
+			kept[item.id] = item;
+		}
+	}
+	store.items = kept;
+	store.apps = Object.fromEntries(
+		Object.entries(store.apps).filter(([id]) => apps.has(Number(id))),
+	);
 }

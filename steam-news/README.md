@@ -140,15 +140,28 @@ runs it (with nvm this is under `~/.nvm/versions/node/`).
 
 - **Newly followed games** contribute only their three most recent posts, so
   following a ten-year-old game doesn't dump its whole history into the feed.
-  `NEW_APP_ITEM_LIMIT` changes this.
-- **Unfollowed games** stop being fetched. Their existing posts stay until they
-  age out of the store.
+  `NEW_APP_ITEM_LIMIT` changes this. The older posts are still recorded as
+  seen, hidden from the feed, so they never surface as new later.
+- **Storage** holds exactly each followed game's twenty newest posts, however
+  old, because forgetting a post Steam still lists would make it look new
+  again. Older posts are dropped; your reader keeps its own copies.
+- **Unfollowed games** are dropped from the store on the next poll. Following
+  one again later counts as a first sight, so it re-enters with three posts.
 - **Publishing** happens only when the set of items changes, so a quiet
   half-hour costs no Netlify write.
 - **Everything local** is in `data/`: `store.json` (state), `feed.xml` (last
   build) and `refresh-token`. Delete `store.json` to start the feed afresh.
 - `--once` runs a single poll and exits. `--no-publish` skips the Netlify
   push and only writes `data/feed.xml`; `FEED_URL` may then be omitted.
+- `--catch-up` runs one poll that records everything Steam currently lists as
+  already seen, publishing nothing new, so the feed continues from now. Use it
+  once after deleting `store.json` or upgrading from a version that lost track
+  of old posts:
+  ```bash
+  sudo systemctl stop steam-news
+  node --env-file=.env index.js --once --catch-up
+  sudo systemctl start steam-news
+  ```
 
 ## Development
 

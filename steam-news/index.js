@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import { createHash } from "node:crypto";
 import { config, hasRefreshToken, readRefreshToken } from "./config.js";
-import { loadStore, pruneItems, saveStore, sortedItems } from "./lib/store.js";
+import { loadStore, pruneStore, saveStore, sortedItems } from "./lib/store.js";
 import { AuthError, SteamAuth } from "./lib/steam-auth.js";
 import {
 	fetchAppFeed,
@@ -12,6 +12,7 @@ import {
 	sleep,
 } from "./lib/steam.js";
 import { buildFeed, parseFeedItems } from "./lib/rss.js";
+import { STEAM_FEED_WINDOW, mergeAppItems } from "./lib/merge.js";
 import { publishFeed } from "./lib/publish.js";
 import { Alerter, sendTelegram } from "./lib/telegram.js";
 
@@ -21,6 +22,9 @@ const APPDETAILS_DELAY_MS = 300;
 
 const runOnce = process.argv.includes("--once");
 const noPublish = process.argv.includes("--no-publish");
+// Records everything currently on Steam as already seen without publishing
+// it, so the feed carries on from now. For recovering after a store reset.
+const catchUp = process.argv.includes("--catch-up");
 
 const stamp = () => `[${new Date().toISOString()}]`;
 const log = (msg) => console.log(`${stamp()} ${msg}`);
@@ -144,21 +148,10 @@ async function fetchNews(appIds) {
 			logError(err.message);
 			return;
 		}
-		const unseen = parseFeedItems(xml)
-			.sort((a, b) => Date.parse(b.pubDate) - Date.parse(a.pubDate))
-			.filter((item) => !store.items[item.id]);
-		const firstTime = !store.apps[appId]?.newsSeenAt;
-		const toAdd = firstTime ? unseen.slice(0, config.newAppItemLimit) : unseen;
-		for (const item of toAdd) {
-			store.items[item.id] = { ...item, appId, addedAt: now };
-			added++;
-		}
-		store.apps[appId] = {
-			name: fallbackName(appId),
-			nameKnown: false,
-			...store.apps[appId],
-			newsSeenAt: now,
-		};
+		added += mergeAppItems(store, appId, parseFeedItems(xml), now, {
+			newAppItemLimit: config.newAppItemLimit,
+			catchUp,
+		});
 	});
 	return { added, failed };
 }
@@ -216,11 +209,14 @@ async function poll() {
 		const appIds = [...new Set([...store.followedApps, ...config.extraAppIds])];
 		await ensureAppNames(appIds);
 		const { added, failed } = await fetchNews(appIds);
-		pruneItems(store, config.maxStoredItems);
+		pruneStore(store, {
+			keepPerApp: STEAM_FEED_WINDOW * 2,
+			apps: new Set(appIds),
+		});
 		const { xml, hash } = buildXml(appIds.length);
 		const published = await publish(xml, hash);
 		log(
-			`Poll done: ${appIds.length} games, ${added} new items, ${failed} feed errors, ${Object.keys(store.items).length} stored, ${published ? "published" : "not published"} (${Date.now() - started}ms)`,
+			`Poll done: ${appIds.length} games, ${added} new items${catchUp ? " (catch-up)" : ""}, ${failed} feed errors, ${Object.keys(store.items).length} stored, ${published ? "published" : "not published"} (${Date.now() - started}ms)`,
 		);
 	} catch (err) {
 		logError(`Poll failed: ${err.stack}`);
