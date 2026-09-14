@@ -13,7 +13,7 @@ import {
 } from "./lib/steam.js";
 import { buildFeed, parseFeedItems } from "./lib/rss.js";
 import { STEAM_FEED_WINDOW, mergeAppItems } from "./lib/merge.js";
-import { publishFeed } from "./lib/publish.js";
+import { pingHub, publishFeed } from "./lib/publish.js";
 import { Alerter, sendTelegram } from "./lib/telegram.js";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -169,6 +169,7 @@ function buildXml(appCount) {
 		link: config.feedUrl || "https://store.steampowered.com/news/",
 		description: `Events and announcements for ${appCount} followed Steam games`,
 		items,
+		hub: config.feedUrl ? config.websubHub : "",
 	});
 	// The build date changes every run, so change detection hashes the item
 	// list rather than the document.
@@ -186,6 +187,13 @@ async function publish(xml, hash) {
 	try {
 		await publishFeed(config.feedUrl, config.feedPushSecret, xml);
 		store.publishedHash = hash;
+		// Readers fall back to their own polling if the hub is unreachable, so
+		// a failed ping is only worth a log line.
+		if (config.websubHub) {
+			await pingHub(config.websubHub, config.feedUrl).catch((err) =>
+				logError(`WebSub ping failed: ${err.message}`),
+			);
+		}
 		await alerter.ok("publish", "Feed publishing is working again.");
 		return true;
 	} catch (err) {

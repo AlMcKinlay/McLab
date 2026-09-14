@@ -26,6 +26,8 @@ export const config = {
 
 	feedUrl: process.env.FEED_URL || "",
 	feedPushSecret: process.env.FEED_PUSH_SECRET || "",
+	// Set WEBSUB_HUB to an empty value to disable hub pings.
+	websubHub: process.env.WEBSUB_HUB ?? "https://pubsubhubbub.appspot.com/",
 
 	extraAppIds: appIdList(process.env.STEAM_EXTRA_APP_IDS),
 

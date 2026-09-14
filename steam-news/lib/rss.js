@@ -94,7 +94,7 @@ function cdata(text) {
 	return `<![CDATA[${String(text).replaceAll("]]>", "]]]]><![CDATA[>")}]]>`;
 }
 
-export function buildFeed({ title, link, description, items }) {
+export function buildFeed({ title, link, description, items, hub = "" }) {
 	const lines = [
 		'<?xml version="1.0" encoding="UTF-8"?>',
 		'<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">',
@@ -103,6 +103,9 @@ export function buildFeed({ title, link, description, items }) {
 		`    <link>${escapeXml(link)}</link>`,
 		`    <description>${escapeXml(description)}</description>`,
 		`    <atom:link href="${escapeXml(link)}" rel="self" type="application/rss+xml" />`,
+		// Advertising a WebSub hub lets readers subscribe to pushes from it
+		// instead of polling us on their own schedule.
+		...(hub ? [`    <atom:link href="${escapeXml(hub)}" rel="hub" />`] : []),
 		"    <language>en-us</language>",
 		`    <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>`,
 	];
