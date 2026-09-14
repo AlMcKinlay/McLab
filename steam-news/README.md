@@ -149,6 +149,12 @@ runs it (with nvm this is under `~/.nvm/versions/node/`).
   one again later counts as a first sight, so it re-enters with three posts.
 - **Publishing** happens only when the set of items changes, so a quiet
   half-hour costs no Netlify write.
+- **WebSub** tells readers about changes promptly. The feed advertises a hub
+  (Google's public one by default, `WEBSUB_HUB` to change or disable) and the
+  service pings it after every publish. Once the reader has crawled the feed
+  once and seen the hub link, it receives new posts within about a minute of
+  publishing rather than on its own crawl schedule. If the hub is down the
+  reader simply falls back to polling.
 - **Everything local** is in `data/`: `store.json` (state), `feed.xml` (last
   build) and `refresh-token`. Delete `store.json` to start the feed afresh.
 - `--once` runs a single poll and exits. `--no-publish` skips the Netlify

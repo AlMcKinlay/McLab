@@ -90,3 +90,17 @@ test("builds a feed with escaped text and safe CDATA", () => {
 	assert.equal(reparsed.length, 2);
 	assert.equal(reparsed[1].description, "<p>Contains a ]]> sequence</p>");
 });
+
+test("advertises a WebSub hub only when one is given", () => {
+	const base = {
+		title: "t",
+		link: "https://example.com/feed.xml",
+		description: "d",
+		items: [],
+	};
+	assert.match(
+		buildFeed({ ...base, hub: "https://hub.example.com/?a=1&b=2" }),
+		/<atom:link href="https:\/\/hub.example.com\/\?a=1&amp;b=2" rel="hub" \/>/,
+	);
+	assert.doesNotMatch(buildFeed(base), /rel="hub"/);
+});
