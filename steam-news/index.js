@@ -82,28 +82,45 @@ async function checkTokenExpiry(steamAuth) {
 	);
 }
 
+// Steam's store occasionally answers a valid session as if it were logged
+// out, so one bad poll proves nothing. Only a run of them is worth an alert;
+// the followed list changes rarely enough that the delay costs nothing.
+const AUTH_FAILURES_BEFORE_ALERT = 3;
+const REMINT_PAUSE_MS = 5_000;
+let authFailures = 0;
+
 async function refreshFollowedList(steamAuth) {
 	for (let attempt = 0; attempt < 2; attempt++) {
 		try {
 			const followed = await fetchFollowedApps(await steamAuth.cookieHeader());
 			store.followedApps = followed;
 			store.followedUpdatedAt = new Date().toISOString();
+			authFailures = 0;
 			await alerter.ok("auth", "Steam login is working again.");
 			return;
 		} catch (err) {
 			if (err instanceof AuthError && attempt === 0) {
-				// Cookies may simply have expired; mint new ones and try again.
+				// Cookies may simply have expired; mint new ones and try again,
+				// after a moment in case the store needs to catch up with them.
 				steamAuth.invalidate();
+				await sleep(REMINT_PAUSE_MS);
 				continue;
 			}
-			if (err instanceof AuthError) {
-				await alerter.fail(
-					"auth",
-					`Steam login failed (${err.message}). Still serving news for the last known ${store.followedApps.length} games, but new follows won't appear. Run \`npm run login\` in steam-news and copy the new token to the server.`,
-				);
-			} else {
+			if (!(err instanceof AuthError)) {
 				logError(`Could not fetch followed apps: ${err.message}`);
+				return;
 			}
+			authFailures++;
+			if (authFailures < AUTH_FAILURES_BEFORE_ALERT) {
+				logError(
+					`Steam login failed (${err.message}), ${authFailures} in a row; alerting after ${AUTH_FAILURES_BEFORE_ALERT}`,
+				);
+				return;
+			}
+			await alerter.fail(
+				"auth",
+				`Steam login has failed ${authFailures} polls in a row (${err.message}). Still serving news for the last known ${store.followedApps.length} games, but new follows won't appear. Run \`npm run login\` in steam-news and copy the new token to the server.`,
+			);
 			return;
 		}
 	}

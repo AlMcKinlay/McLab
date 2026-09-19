@@ -14,18 +14,29 @@ function authorised(req) {
 	return timingSafeEqual(digest(header.slice(7)), digest(secret));
 }
 
+// Who fetches the feed, and when, shows up in the Netlify function log. This
+// is how we tell a reader's own polling apart from a WebSub hub fetch.
+function logRequest(req, status) {
+	const ua = req.headers.get("user-agent") || "-";
+	console.log(`${req.method} ${status} ua="${ua}"`);
+}
+
 export default async (req) => {
 	const store = getStore({ name: STORE_NAME, consistency: "strong" });
 
 	if (req.method === "GET" || req.method === "HEAD") {
 		const xml = await store.get(KEY);
 		if (xml === null) {
+			logRequest(req, 404);
 			return new Response("Feed not published yet", { status: 404 });
 		}
+		logRequest(req, 200);
 		return new Response(req.method === "HEAD" ? null : xml, {
 			headers: {
 				"Content-Type": "application/rss+xml; charset=utf-8",
-				"Cache-Control": "public, max-age=300",
+				// Not cached at the edge, so every fetch reaches this function
+				// and is logged. The feed is small and rarely fetched.
+				"Cache-Control": "no-cache",
 			},
 		});
 	}
@@ -39,6 +50,7 @@ export default async (req) => {
 			return new Response("Body is not an RSS document", { status: 400 });
 		}
 		await store.set(KEY, xml);
+		logRequest(req, 204);
 		return new Response(null, { status: 204 });
 	}
 
