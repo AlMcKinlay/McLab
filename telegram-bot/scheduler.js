@@ -74,6 +74,15 @@ export async function initializeScheduler(bot) {
 	);
 }
 
+// Telegram from the home server occasionally stalls; one slow request must
+// not cost the whole night, so each failed attempt is retried after a pause.
+const PROMPT_RETRY_DELAYS_MS = [30_000, 120_000, 300_000];
+const SEND_TIMEOUT_MS = 15000;
+
+function sleep(ms) {
+	return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 async function sendDailyPrompt(bot) {
 	if (hasAlreadyPromptedToday()) {
 		console.log(
@@ -89,50 +98,66 @@ async function sendDailyPrompt(bot) {
 		return;
 	}
 
-	try {
-		const todayFilled = await withTimeout(
-			checkTodayFilled(),
-			10000,
-			"checkTodayFilled",
-		);
-
-		if (todayFilled.filled) {
-			console.log(
-				`[${new Date().toISOString()}] ✓ Today's status already filled, no prompt needed`,
-			);
-			setPromptedToday();
+	const attempts = PROMPT_RETRY_DELAYS_MS.length + 1;
+	for (let attempt = 1; attempt <= attempts; attempt++) {
+		try {
+			await attemptDailyPrompt(bot);
 			return;
+		} catch (error) {
+			const delay = PROMPT_RETRY_DELAYS_MS[attempt - 1];
+			if (delay === undefined) {
+				console.error(
+					`[${new Date().toISOString()}] ✗ Failed to send daily prompt after ${attempts} attempts: ${error.message}`,
+				);
+				return;
+			}
+			console.error(
+				`[${new Date().toISOString()}] ✗ Daily prompt attempt ${attempt} failed: ${error.message}; retrying in ${delay / 1000}s`,
+			);
+			await sleep(delay);
 		}
-
-		// Send the daily prompt with rating buttons
-		await withTimeout(
-			bot.telegram.sendMessage(
-				config.groupChatId,
-				`🌙 <b>Don't forget to track today's status!</b>`,
-				{
-					parse_mode: "HTML",
-					reply_markup: {
-						inline_keyboard: [
-							[
-								{ text: "😊 Good", callback_data: "rating_good" },
-								{ text: "😐 OK", callback_data: "rating_ok" },
-								{ text: "😞 Bad", callback_data: "rating_bad" },
-							],
-						],
-					},
-				},
-			),
-			5000,
-			"sendMessage",
-		);
-
-		setPromptedToday();
-		console.log(
-			`[${new Date().toISOString()}] ✓ Daily status prompt sent to group`,
-		);
-	} catch (error) {
-		console.error(
-			`[${new Date().toISOString()}] ✗ Failed to send daily prompt: ${error.message}`,
-		);
 	}
+}
+
+async function attemptDailyPrompt(bot) {
+	const todayFilled = await withTimeout(
+		checkTodayFilled(),
+		10000,
+		"checkTodayFilled",
+	);
+
+	if (todayFilled.filled) {
+		console.log(
+			`[${new Date().toISOString()}] ✓ Today's status already filled, no prompt needed`,
+		);
+		setPromptedToday();
+		return;
+	}
+
+	// Send the daily prompt with rating buttons
+	await withTimeout(
+		bot.telegram.sendMessage(
+			config.groupChatId,
+			`🌙 <b>Don't forget to track today's status!</b>`,
+			{
+				parse_mode: "HTML",
+				reply_markup: {
+					inline_keyboard: [
+						[
+							{ text: "😊 Good", callback_data: "rating_good" },
+							{ text: "😐 OK", callback_data: "rating_ok" },
+							{ text: "😞 Bad", callback_data: "rating_bad" },
+						],
+					],
+				},
+			},
+		),
+		SEND_TIMEOUT_MS,
+		"sendMessage",
+	);
+
+	setPromptedToday();
+	console.log(
+		`[${new Date().toISOString()}] ✓ Daily status prompt sent to group`,
+	);
 }
