@@ -6,7 +6,7 @@
 		"react": "19.3.0",
 		"react-dom": "19.3.0",
 		"react-scripts": "5.0.1",
-		"styled-components": "6.5.3",
+		"styled-components": "6.6.0",
 		"shared-utils": "file:../shared"
 	},
 	"scripts": {
